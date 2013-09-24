@@ -1,7 +1,7 @@
 
 #ifdef DEBUG
-#define SHOW(x) cout << #x << "= " << x << endl;
-#define STATE(x) cout << #x << endl;
+#define SHOW(x) cout << "\t|    " << #x << "= " << x << endl;
+#define STATE(x) cout << "\n\t| " << #x << endl;
 #else 
 #define SHOW(x)
 #define STATE(x)
@@ -29,12 +29,11 @@ int checkbinary(char* passed)
 
 	catch (char* &missing)
 	{
-		STATE(File Missing);
 		cout << "Error: OGLbash could not locate: " << missing << endl;
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 int checkascii(char* passed)
@@ -53,51 +52,53 @@ int checkascii(char* passed)
 
 	catch (char* &missing)
 	{
-		STATE(File Missing);
 		cout << "Error: OGLbash could not locate: " << missing << endl;
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 int main(int argc, char** argv)
 {
+	STATE(DEBUG mode);	
+
 	if (argc != 2)
 	{
 		cout << "Invalid input for OGLBG. Please use the following format: OGLBG <source file>" << endl;
 		return 1;
 	}
 	
-	char check[25];
+	char check[50];
 	int missing = 0;
 
+	STATE(Checking working directory for necessary files...);
 	strcpy(check, "libfreeglut_static.a");
-	if (checkbinary(check) != 0)
+	if (! (checkbinary(check)) )
 		missing++;
 
 	strcpy(check, "libglew32.a");
-	if (checkbinary(check) != 0)
+	if (! (checkbinary(check)) )
 		missing++;
 
 	strcpy(check, "glew.h");
-	if (checkascii(check) != 0)
+	if (! (checkascii(check)) )
 		missing++;
 
 	strcpy(check, "freeglut.h");
-	if (checkascii(check) != 0)
+	if (! (checkascii(check)) )
 		missing++;
 
 	strcpy(check, "freeglut_ext.h");
-	if (checkascii(check) != 0)
+	if (! (checkascii(check)) )
 		missing++;
 
 	strcpy(check, "freeglut_std.h");
-	if (checkascii(check) != 0)
+	if (! (checkascii(check)) )
 		missing++;
 
 	strcpy(check, "glut.h");
-	if (checkascii(check) != 0)
+	if (! (checkascii(check)) )
 		missing++;
 
 	if (missing > 0)
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
 	char filename[stringlength];
 	char fullname[stringlength];
 
-	SHOW(argv[1]);
+	STATE(Setting strings...);
 	
 	bool filenameEnd = false;
 
@@ -138,12 +139,9 @@ int main(int argc, char** argv)
 			fullname[i] = '\0';
 	}
 
-	SHOW(filename);
-	SHOW(fullname);
-
-	if (checkascii(fullname) != 0)
+	STATE(Checking working directory for source file...);
+	if (! (checkascii(fullname)) )
 	{
-		cout << "Error: could not find \"" << fullname << "\" in working directory." << endl;
 		return 1;
 	}
 
@@ -165,6 +163,10 @@ int main(int argc, char** argv)
 	strcat (exefile, ".exe");
 	strcat (bashfile, "_bash");
 
+	STATE(String list:);
+	SHOW(argv[1]);
+	SHOW(filename);
+	SHOW(fullname);
 	SHOW(objectfile);
 	SHOW(exefile);
 	SHOW(bashfile);
@@ -177,8 +179,6 @@ int main(int argc, char** argv)
 	strcat(bashstring1, fullname);
 	strcat(bashstring1, " -I.\n");
 
-	SHOW(bashstring1);
-
 	char bashstring2[99+strlen(objectfile)+strlen(exefile)];
 
 	strcpy(bashstring2, "g++ -o ");
@@ -188,8 +188,6 @@ int main(int argc, char** argv)
 	strcat(bashstring2, " -L. -lfreeglut_static -lglew32 -lglu32 ");
 	strcat(bashstring2, "-lopengl32 -lwinmm -lgdi32 -Wl,--subsystem,windows\n");
 
-	SHOW(bashstring2);
-
 	ofstream fout(bashfile);
 	fout << bashstring1 << bashstring2 << "rm " << objectfile << "\n"; 
 	if (bashfile)
@@ -198,6 +196,8 @@ int main(int argc, char** argv)
 		cout << " To run, enter \"sh " << bashfile << "\"" << endl;
 	}
 	fout.close();
+
+	STATE(End of opengl_bash_generator.cpp);
 
 	return 0;
 }
