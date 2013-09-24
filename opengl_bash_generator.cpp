@@ -13,7 +13,7 @@
 
 using namespace std;
 
-int checklibrary(char* passed)
+int checkbinary(char* passed)
 {
 	SHOW(passed);
 	try
@@ -37,7 +37,7 @@ int checklibrary(char* passed)
 	return 0;
 }
 
-int checkheader(char* passed)
+int checkascii(char* passed)
 {
 	SHOW(passed);
 	try
@@ -73,31 +73,31 @@ int main(int argc, char** argv)
 	int missing = 0;
 
 	strcpy(check, "libfreeglut_static.a");
-	if (checklibrary(check) != 0)
+	if (checkbinary(check) != 0)
 		missing++;
 
 	strcpy(check, "libglew32.a");
-	if (checklibrary(check) != 0)
+	if (checkbinary(check) != 0)
 		missing++;
 
 	strcpy(check, "glew.h");
-	if (checkheader(check) != 0)
+	if (checkascii(check) != 0)
 		missing++;
 
 	strcpy(check, "freeglut.h");
-	if (checkheader(check) != 0)
+	if (checkascii(check) != 0)
 		missing++;
 
 	strcpy(check, "freeglut_ext.h");
-	if (checkheader(check) != 0)
+	if (checkascii(check) != 0)
 		missing++;
 
 	strcpy(check, "freeglut_std.h");
-	if (checkheader(check) != 0)
+	if (checkascii(check) != 0)
 		missing++;
 
 	strcpy(check, "glut.h");
-	if (checkheader(check) != 0)
+	if (checkascii(check) != 0)
 		missing++;
 
 	if (missing > 0)
@@ -108,7 +108,6 @@ int main(int argc, char** argv)
 
 	int stringlength = strlen(argv[1]);
 
-	char ch;
 	char filename[stringlength];
 	char fullname[stringlength];
 
@@ -141,6 +140,12 @@ int main(int argc, char** argv)
 
 	SHOW(filename);
 	SHOW(fullname);
+
+	if (checkascii(fullname) != 0)
+	{
+		cout << "Error: could not find \"" << fullname << "\" in working directory." << endl;
+		return 1;
+	}
 
 	if (dotCount>1)
 	{
