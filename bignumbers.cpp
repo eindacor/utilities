@@ -45,6 +45,7 @@ class bigNumber
 		bool operator > (bigNumber b);
 		void operator += (bigNumber b);
 		void operator -= (bigNumber b);
+	//	void operator *= (bigNumber b);
 
 	private:
 		int digits[MAXDIGITS];
@@ -324,6 +325,11 @@ bigNumber multiplyNumbers(bigNumber bn1, bigNumber bn2)
     }
  
     return temp;   
+}
+
+bigNumber factorial(bigNumber bn1)
+{
+    
 }
 
 int main()
