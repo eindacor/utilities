@@ -32,7 +32,7 @@ class bigNumber
 		bigNumber(vector<int> n);
 		bigNumber();
 		bigNumber(int n);
-		~bigNumber() {};
+		~bigNumber() {};    
 
 		int getDigit(int n) {return digits[n];}
 		int getDigitCount();
@@ -158,6 +158,7 @@ bool bigNumber::operator < (bigNumber b)
     
     if (negative==true && b.getNegative()==false)
     {
+        SHOWLINE;
         return true;
     }
     
@@ -168,11 +169,12 @@ bool bigNumber::operator < (bigNumber b)
     
     if (negative==true && b.getNegative()==true)
     {
-        return !( absolute() < b.absolute() );
+        return ( absolute() > b.absolute() );
     }
     
     if (digitCount < b.getDigitCount())
     {
+        SHOWLINE;
         return true;
     }
     
@@ -186,7 +188,14 @@ bool bigNumber::operator < (bigNumber b)
     {
         if (digits[i] < b.getDigit(i))
         {
+            SHOW(cout << digits[i] << " < " << b.getDigit(i) << endl;)
             return true;
+        }
+        
+        if (digits[i] > b.getDigit(i))
+        {
+            SHOW(cout << digits[i] << " < " << b.getDigit(i) << endl;)
+            return false;
         }
     }
     
@@ -212,6 +221,7 @@ bool bigNumber::operator > (bigNumber b)
     
     if (negative==false && b.getNegative()==true)
     {
+        SHOWLINE;
         return true;
     }
     
@@ -222,11 +232,12 @@ bool bigNumber::operator > (bigNumber b)
     
     if (negative==true && b.getNegative()==true)
     {
-        return !( absolute() > b.absolute() );
+        return ( absolute() < b.absolute() );
     }
     
     if (digitCount > b.getDigitCount())
     {
+        SHOWLINE;
         return true;
     }
     
@@ -239,7 +250,14 @@ bool bigNumber::operator > (bigNumber b)
     {
         if (digits[i] > b.getDigit(i))
         {
+            SHOW(cout << digits[i] << " < " << b.getDigit(i) << endl;)
             return true;
+        }
+        
+        if (digits[i] < b.getDigit(i))
+        {
+            SHOW(cout << digits[i] << " < " << b.getDigit(i) << endl;)
+            return false;
         }
     }
     
@@ -541,7 +559,6 @@ bigNumber multiplyNumbers(bigNumber bn1, bigNumber bn2)
     for (int i=0; i<bn2.getDigitCount(); i++)
     {
         bigNumber toAdd( multiplyNumbersSimple ( multiplyNumbersSimple (bn1.absolute(), bn2.getDigit(i)) , pow((double)10, (int)i)) );
-        SHOW(cout << endl << "toAdd: "; toAdd.printNumber(); << cout << endl);
         temp += toAdd;
     }
  
@@ -675,9 +692,9 @@ int main()
 	testGreaterThan(negative1, positive1);
 	testGreaterThan(negative1, negative1);
 	testGreaterThan(negative1, positive2);
-	testGreaterThan(negative1, negative2);  //incorrect
+	testGreaterThan(negative1, negative2);
 	cout << endl;
-	testGreaterThan(positive2, positive1);  //incorrect
+	testGreaterThan(positive2, positive1);
 	testGreaterThan(positive2, negative1);
 	testGreaterThan(positive2, positive2);
 	testGreaterThan(positive2, negative2);
@@ -689,7 +706,7 @@ int main()
 	cout << endl;
 	testLessThan(positive1, positive1);
 	testLessThan(positive1, negative1);
-	testLessThan(positive1, positive2);  //incorrect   
+	testLessThan(positive1, positive2);
 	testLessThan(positive1, negative2);
 	cout << endl;
 	testLessThan(negative1, positive1);
@@ -703,7 +720,7 @@ int main()
 	testLessThan(positive2, negative2);
 	cout << endl;
 	testLessThan(negative2, positive1);
-	testLessThan(negative2, negative1);  //incorrect
+	testLessThan(negative2, negative1);
 	testLessThan(negative2, positive2);
 	testLessThan(negative2, negative2);
 	cout << endl;
