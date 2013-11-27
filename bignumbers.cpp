@@ -2,9 +2,13 @@
 #include <vector>
 #include <math.h>
 
-#define DEBUG
-
 #define MAXDIGITS 100
+
+#ifdef NOCOMMAS
+#define COMMA 
+#else 
+#define COMMA cout << ","
+#endif
 
 #ifdef DEBUG
 #define DECLARE(x) cout << "\n\t|  DECLARATION: " << #x << "= " << x
@@ -31,26 +35,32 @@ class bigNumber
 		~bigNumber() {};
 
 		int getDigit(int n) {return digits[n];}
-
 		int getDigitCount();
-		
 		void printNumber();
-
 		bool getNegative() {return negative;}
-		
 		int updateDigits();
 		
 		void setNegative() {negative = true;}
 		void setPositive() {negative = false;}
 		
-		bool operator < (bigNumber &b);
-		bool operator > (bigNumber &b);
-		bool operator > (int n);
-		bool operator < (int n);
-		void operator += (bigNumber &b);
-		void operator -= (bigNumber &b);
-		void operator *= (bigNumber &b);
-		void operator --();
+		bool operator < (bigNumber b);     //updated
+		bool operator > (bigNumber b);     //updated
+		bool operator > (int n);            //updated
+		bool operator < (int n);            //updated
+		bool operator == (bigNumber b); 
+		bool operator == (int n);   
+		void operator += (bigNumber b);    
+		void operator -= (bigNumber b);
+		void operator *= (bigNumber b);
+		void operator -- (int);
+		void operator = (bigNumber b);
+		bigNumber operator * (bigNumber b); //updated
+		bigNumber operator * (int n);       //updated
+		bigNumber operator + (bigNumber b); //updated
+		bigNumber operator + (int n);       //updated
+		bigNumber operator - (bigNumber b); //updated
+		bigNumber operator - (int n);       //updated
+		bigNumber absolute();
 
 		void decrement();
 
@@ -60,7 +70,23 @@ class bigNumber
 		bool negative;
 };
 
-void bigNumber::operator --()
+void bigNumber::operator = (bigNumber b)
+{
+    int highestDigits=0;
+    if (digitCount < b.getDigitCount())
+        highestDigits = b.getDigitCount();
+        
+    else highestDigits = b.getDigitCount()+1;
+    
+    for (int i=0; i<highestDigits; i++)
+    {
+        digits[i] = b.getDigit(i);
+    }
+    
+    updateDigits();
+}
+
+void bigNumber::operator -- (int)
 {
 	bigNumber temp(1);
 	*this -= temp;
@@ -68,12 +94,17 @@ void bigNumber::operator --()
 
 bigNumber::bigNumber(int n)
 {
+    negative = (n<0);
+    if(n<0)
+    {
+      n *= -1;
+    }
+    
 	for (int i=0; i<MAXDIGITS; i++)
     {
         digits[i]=0;
     }
     
-    negative = false;
     for (int i=0; i<20; i++)
     {
 		int modifier = (pow((double) 10, i+1));
@@ -86,11 +117,58 @@ bigNumber::bigNumber(int n)
     }
 }
 
-bool bigNumber::operator < (bigNumber &b)
+bool bigNumber::operator == (bigNumber b)
 {
+    if (negative != b.getNegative())
+    {
+        return false;
+    }
+    
+    if (digitCount != b.getDigitCount())
+    {
+        return false;
+    }
+    
+    for (int i=digitCount-1; i>=0; i--)
+    {
+        if (digits[i] != b.getDigit(i))
+        {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+bool bigNumber::operator == (int n)
+{
+    bigNumber b(n);
+    return (*this == b);
+}
+
+bool bigNumber::operator < (bigNumber b)
+{
+    updateDigits();
+    b.updateDigits();
+    
+    if (*this == b)
+    {
+        return false;
+    }
+    
     if (negative==true && b.getNegative()==false)
     {
         return true;
+    }
+    
+    if (negative==false && b.getNegative()==true)
+    {
+        return false;
+    }
+    
+    if (negative==true && b.getNegative()==true)
+    {
+        return !( absolute() < b.absolute() );
     }
     
     if (digitCount < b.getDigitCount())
@@ -98,41 +176,53 @@ bool bigNumber::operator < (bigNumber &b)
         return true;
     }
     
-    if (digits[digitCount-1] < b.getDigit(digitCount-1))
+    if (digitCount > b.getDigitCount())
     {
-        return true;
+        return false;
     }
 
+    
+    for (int i=digitCount-1; i>=0; i--)
+    {
+        if (digits[i] < b.getDigit(i))
+        {
+            return true;
+        }
+    }
+    
     return false;
 }
 
 bool bigNumber::operator < (int n)
 {
 	bigNumber b(n);
-
-    if (negative==true && b.getNegative()==false)
-    {
-        return true;
-    }
-    
-    if (digitCount < b.getDigitCount())
-    {
-        return true;
-    }
-    
-    if (digits[digitCount-1] < b.getDigit(digitCount-1))
-    {
-        return true;
-    }
-
-    return false;
+    updateDigits(); 
+    return (*this < b);
 }
 
-bool bigNumber::operator > (bigNumber &b)
+bool bigNumber::operator > (bigNumber b)
 {
+    updateDigits();
+    b.updateDigits();
+    
+    if (*this == b)
+    {
+        return false;
+    }
+    
     if (negative==false && b.getNegative()==true)
     {
         return true;
+    }
+    
+    if (negative==true && b.getNegative()==false)
+    {
+        return false;
+    }
+    
+    if (negative==true && b.getNegative()==true)
+    {
+        return !( absolute() > b.absolute() );
     }
     
     if (digitCount > b.getDigitCount())
@@ -140,9 +230,17 @@ bool bigNumber::operator > (bigNumber &b)
         return true;
     }
     
-    if (digits[digitCount-1] > b.getDigit(digitCount-1))
+    if (digitCount < b.getDigitCount())
     {
-        return true;
+        return false;
+    }
+    
+    for (int i=digitCount-1; i>=0; i--)
+    {
+        if (digits[i] > b.getDigit(i))
+        {
+            return true;
+        }
     }
     
     return false;
@@ -151,23 +249,8 @@ bool bigNumber::operator > (bigNumber &b)
 bool bigNumber::operator > (int n)
 {
 	bigNumber b(n);
-
-    if (negative==false && b.getNegative()==true)
-    {
-        return true;
-    }
-    
-    if (digitCount > b.getDigitCount())
-    {
-        return true;
-    }
-    
-    if (digits[digitCount-1] > b.getDigit(digitCount-1))
-    {
-        return true;
-    }
-    
-    return false;
+    updateDigits(); 
+    return (*this > b);
 }
 
 int bigNumber::updateDigits()
@@ -190,6 +273,7 @@ bigNumber::bigNumber()
         digits[i]=0;
     }
     
+    digitCount=0;
     negative = false;
 }
 
@@ -230,6 +314,9 @@ void bigNumber::printNumber()
 {
     updateDigits();
     
+    if (digitCount==0)
+        cout << 0;
+    
 	int comma = digitCount % 3;
 	
 	if (negative==true)
@@ -240,7 +327,9 @@ void bigNumber::printNumber()
 		if (comma==0)
 		{
 		    if (i>0)
-			    cout << ",";
+		    {
+			    COMMA;
+		    }
 			    
 			comma = 3;
 		}
@@ -289,19 +378,75 @@ bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2)
 
 bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 {
-    if (bn1.getNegative()==true && bn2.getNegative()==true)
+    if (bn1.absolute() == bn2.absolute())
     {
-        bigNumber negativeSum(addNumbers(bn1, bn2));
-        negativeSum.setNegative();
-        return negativeSum;
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bn1.absolute() + bn2.absolute();
+            temp.setNegative();
+            return temp;
+        }
         
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bn1.absolute() + bn2.absolute();
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bn1.absolute() - bn2.absolute();
+            temp.setNegative();
+            return temp;
+        }
     }
     
-    if (bn1<bn2 && bn1.getNegative()==false && bn2.getNegative()==false)
+    if (bn1.absolute() > bn2.absolute())
     {
-        bigNumber negativeNumber(subtractNumbers(bn2, bn1));
-        negativeNumber.setNegative();
-        return negativeNumber;
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bn1.absolute() + bn2.absolute();
+            temp.setNegative();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bn1.absolute() + bn2.absolute();
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bn1.absolute() - bn2.absolute();
+            temp.setNegative();
+            return temp;
+        }
+    }
+    
+    if (bn1.absolute() < bn2.absolute())
+    {
+        if (bn1.getNegative()==false && bn2.getNegative()==false)
+        {
+            bigNumber temp = bn2.absolute() - bn1.absolute();
+            temp.setNegative();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bn1.absolute() + bn2.absolute();
+            temp.setNegative();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bn1.absolute() + bn2.absolute();
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            return bn2.absolute() - bn1.absolute();
+        }
     }
     
     vector<int> temp;
@@ -332,7 +477,7 @@ bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 	return sum;
 }
 
-void bigNumber::operator += (bigNumber &b)
+void bigNumber::operator += (bigNumber b)
 {
     bigNumber temp(addNumbers(*this, b));
     
@@ -342,7 +487,7 @@ void bigNumber::operator += (bigNumber &b)
     }
 }
 
-void bigNumber::operator -= (bigNumber &b)
+void bigNumber::operator -= (bigNumber b)
 {
     bigNumber temp(subtractNumbers(*this, b));
     
@@ -361,14 +506,19 @@ void bigNumber::decrement()
 
 bigNumber multiplyNumbersSimple(bigNumber bn1, int n)
 {
+    
     if (n==0)
     {
-        vector<int> one;
-        one.push_back(1);
-        return bigNumber(one);
+        bigNumber zero;
+        return zero;
     }
     
     bigNumber temp(bn1);
+    
+    if (bn1.getNegative() == n<0)
+    {
+        temp.setPositive();
+    }
     
     for (int i=0; i<(n-1); i++)
     {
@@ -380,26 +530,58 @@ bigNumber multiplyNumbersSimple(bigNumber bn1, int n)
 
 bigNumber multiplyNumbers(bigNumber bn1, bigNumber bn2)
 {
-    bigNumber temp;
+    bigNumber temp(0);
     
     if (bn1.getNegative() != bn2.getNegative())
         temp.setNegative();
     
-    bn1.setPositive();
     bn1.updateDigits();
-    bn2.setPositive();
     bn2.updateDigits();
     
     for (int i=0; i<bn2.getDigitCount(); i++)
     {
-        bigNumber toAdd( multiplyNumbersSimple( multiplyNumbersSimple(bn1, bn2.getDigit(i)) , pow((double)10, (int)i)) );
+        bigNumber toAdd( multiplyNumbersSimple ( multiplyNumbersSimple (bn1.absolute(), bn2.getDigit(i)) , pow((double)10, (int)i)) );
+        SHOW(cout << endl << "toAdd: "; toAdd.printNumber(); << cout << endl);
         temp += toAdd;
     }
  
     return temp;   
 }
 
-void bigNumber::operator *= (bigNumber &b)
+bigNumber bigNumber::operator * (bigNumber b)
+{
+    return multiplyNumbers (*this, b);
+}
+
+bigNumber bigNumber::operator * (int n)
+{
+    bigNumber b(n);
+    return multiplyNumbers (*this, b);
+}
+
+bigNumber bigNumber:: operator + (bigNumber b)
+{
+    return addNumbers(*this, b);
+}
+
+bigNumber bigNumber:: operator + (int n)
+{
+    bigNumber b(n);
+    return addNumbers(*this, b);
+}
+
+bigNumber bigNumber:: operator - (bigNumber b)
+{
+    return subtractNumbers(*this, b);
+}
+
+bigNumber bigNumber:: operator - (int n)
+{
+    bigNumber b(n);
+    return subtractNumbers(*this, b);
+}
+
+void bigNumber::operator *= (bigNumber b)
 {
     bigNumber temp(multiplyNumbers(*this, b));
     
@@ -412,192 +594,141 @@ void bigNumber::operator *= (bigNumber &b)
 bigNumber factorial(bigNumber bn)
 {
     bigNumber temp(bn);
-	bigNumber counter(temp);
 
-	temp *= counter;
-	temp *= counter;
-	temp *= counter;
-	temp *= counter;
-	temp *= counter;
-	temp *= counter;
-
-	if (counter < temp)
-		SHOWLINE;
+    for (bigNumber counter(bn); counter > (int) 1 ; counter--)
+    {
+        if (bn > counter)
+        {
+            temp *= counter;
+            SHOW(cout << endl << "temp: "; temp.printNumber());
+            SHOW(cout << endl << "counter: "; counter.printNumber());
+        }
+    }
 
 	return temp;
 }
 
+bigNumber bigNumber::absolute()
+{
+    bigNumber temp = *this;
+    temp.setPositive();
+    return temp;
+}
+
+void testGreaterThan(bigNumber bn1, bigNumber bn2)
+{
+    bn1.printNumber();
+    cout << " > ";
+    bn2.printNumber();
+    cout << " is ";
+    if (bn1 > bn2)
+    {
+        cout << "true";
+    }
+    
+    else cout << "false";
+    cout << endl;
+}
+
+void testLessThan(bigNumber bn1, bigNumber bn2)
+{
+    bn1.printNumber();
+    cout << " < ";
+    bn2.printNumber();
+    cout << " is ";
+    if (bn1 < bn2)
+    {
+        cout << "true";
+    }
+    
+    else cout << "false";
+    cout << endl;
+}
+
+void testEquals(bigNumber bn1, bigNumber bn2)
+{
+    bn1.printNumber();
+    cout << " == ";
+    bn2.printNumber();
+    cout << " is ";
+    if (bn1 == bn2)
+    {
+        cout << "true";
+    }
+    
+    else cout << "false";
+    cout << endl;
+}
 
 int main()
 {
-	vector<int>firstVector;
-
-	firstVector.push_back(1);
-	firstVector.push_back(3);
-	firstVector.push_back(8);
-	firstVector.push_back(5);
-	firstVector.push_back(2);
-	firstVector.push_back(5);
-	firstVector.push_back(8);
-	firstVector.push_back(3);
-	firstVector.push_back(7);
-	firstVector.push_back(5);
-	firstVector.push_back(6);
-
-	vector<int>secondVector;
-
-	secondVector.push_back(9);
-	secondVector.push_back(8);
-	secondVector.push_back(1);
-	secondVector.push_back(3);
-	secondVector.push_back(5);
-	secondVector.push_back(8);
-	secondVector.push_back(3);
-	secondVector.push_back(4);
-	secondVector.push_back(4);
-
-	bigNumber first(firstVector);
-	bigNumber second(secondVector);
-
-	cout << "first: ";
-	first.printNumber();
-	cout << endl << "second: ";
-	second.printNumber();
-
-	bigNumber third(addNumbers(first, second));
+	bigNumber positive1(968723);
+	bigNumber negative1(-732863);
+	bigNumber positive2(647382);
+	bigNumber negative2(-846243);
+	
+	testGreaterThan(positive1, positive1);
+	testGreaterThan(positive1, negative1);
+	testGreaterThan(positive1, positive2);
+	testGreaterThan(positive1, negative2);
 	cout << endl;
-	first.printNumber();
-	cout << " + ";
-	second.printNumber();
-	cout << " = ";
-	third.printNumber();
+	testGreaterThan(negative1, positive1);
+	testGreaterThan(negative1, negative1);
+	testGreaterThan(negative1, positive2);
+	testGreaterThan(negative1, negative2);  //incorrect
+	cout << endl;
+	testGreaterThan(positive2, positive1);  //incorrect
+	testGreaterThan(positive2, negative1);
+	testGreaterThan(positive2, positive2);
+	testGreaterThan(positive2, negative2);
+	cout << endl;
+	testGreaterThan(negative2, positive1);
+	testGreaterThan(negative2, negative1);
+	testGreaterThan(negative2, positive2);
+	testGreaterThan(negative2, negative2);
+	cout << endl;
+	testLessThan(positive1, positive1);
+	testLessThan(positive1, negative1);
+	testLessThan(positive1, positive2);  //incorrect   
+	testLessThan(positive1, negative2);
+	cout << endl;
+	testLessThan(negative1, positive1);
+	testLessThan(negative1, negative1);
+	testLessThan(negative1, positive2);
+	testLessThan(negative1, negative2);    
+	cout << endl;
+	testLessThan(positive2, positive1);
+	testLessThan(positive2, negative1);
+	testLessThan(positive2, positive2);
+	testLessThan(positive2, negative2);
+	cout << endl;
+	testLessThan(negative2, positive1);
+	testLessThan(negative2, negative1);  //incorrect
+	testLessThan(negative2, positive2);
+	testLessThan(negative2, negative2);
+	cout << endl;
+	testEquals(positive1, positive1);
+	testEquals(positive1, negative1);
+	testEquals(positive1, positive2);     
+	testEquals(positive1, negative2);
+	cout << endl;
+	testEquals(negative1, positive1);
+	testEquals(negative1, negative1);
+	testEquals(negative1, positive2);
+	testEquals(negative1, negative2);     
+	cout << endl;
+	testEquals(positive2, positive1);
+	testEquals(positive2, negative1);
+	testEquals(positive2, positive2);
+	testEquals(positive2, negative2);
+	cout << endl;
+	testEquals(negative2, positive1);
+	testEquals(negative2, negative1);
+	testEquals(negative2, positive2);
+	testEquals(negative2, negative2);
+
 	
 	cout << endl;
-	first.printNumber();
-	cout << " < ";
-	second.printNumber();
-	cout << " is ";
-	if (first < second == true)
-	{
-	    cout << "true";
-	}
-	else cout << "false";
-	
-	bigNumber fourth(subtractNumbers(first, second));
-	cout << endl;
-	first.printNumber();
-	cout << " - ";
-	second.printNumber();
-	cout << " = ";
-	fourth.printNumber();
-	
-	cout << endl;
-	second.printNumber();
-	cout << " < ";
-	first.printNumber();
-	cout << " is ";
-	if (second < first == true)
-	{
-	    cout << "true";
-	}
-	else cout << "false";
-	
-	cout << endl;
-	second.printNumber();
-	cout << " > ";
-	first.printNumber();
-	cout << " is ";
-	if (second > first == true)
-	{
-	    cout << "true";
-	}
-	else cout << "false";
-	
-	cout << endl;
-	first.printNumber();
-	cout << " += ";
-	second.printNumber();
-	first += second;
-	cout << endl << "first: ";
-	first.printNumber();
-
-	cout << endl << "multiplyNumbersSimple(first, 5) = ";
-	bigNumber fifth(multiplyNumbersSimple(first, 5));
-	fifth.printNumber();
-	
-	cout << endl;
-	second.printNumber();
-	cout << " - ";
-	first.printNumber();
-	cout << " = ";
-	bigNumber sixth(subtractNumbers(second, first));
-	sixth.printNumber();
-	
-	cout << endl;
-	
-	vector<int>thirdVector;
-	thirdVector.push_back(1);
-	thirdVector.push_back(3);
-	thirdVector.push_back(8);
-	thirdVector.push_back(5);
-	bigNumber seventh(thirdVector);
-	
-	vector<int>fourthVector;
-	fourthVector.push_back(2);
-	fourthVector.push_back(2);
-	fourthVector.push_back(4);
-	bigNumber eighth(fourthVector);
-	
-	cout << endl;
-	cout << "seventh: ";
-	seventh.printNumber();
-	cout << endl << "eighth: ";
-	eighth.printNumber();
-	
-	bigNumber ninth(multiplyNumbers(seventh, eighth));
-	
-	cout << endl;
-	seventh.printNumber();
-	cout << " * ";
-	eighth.printNumber();
-	cout << " = ";
-	ninth.printNumber();
-
-	bigNumber eleventh(28777932);
-	cout << endl;
-	cout << "eleventh: ";
-	eleventh.printNumber();
-
-	bigNumber thirteenth(4);
-	thirteenth *= bigNumber(7);
-	cout << endl;
-	cout << "thirteenth: ";
-	thirteenth.printNumber();
-
-	bigNumber joe(1);
-	cout << endl;
-	cout << "joe: ";
-	joe.printNumber();
-
-	bigNumber fourteenth(factorial(bigNumber(4)));
-	cout << endl;
-	cout << "fourteenth: ";
-	fourteenth.printNumber();
-
-
-	/*
-	bigNumber tenth(multiplyNumbers(first, second));
-	cout << endl;
-	first.printNumber();
-	cout << " * ";
-	second.printNumber();
-	cout << " = ";
-	tenth.printNumber();
-	*/
-	
-	cout << endl;
-	char response;
-	cin >> response;
 	return 0;
 }
 
