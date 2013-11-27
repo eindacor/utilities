@@ -2,7 +2,9 @@
 #include <vector>
 #include <math.h>
 
-#define MAXDIGITS 1000
+#define DEBUG
+
+#define MAXDIGITS 100
 
 #ifdef DEBUG
 #define DECLARE(x) cout << "\n\t|  DECLARATION: " << #x << "= " << x
@@ -25,7 +27,7 @@ class bigNumber
 	public:
 		bigNumber(vector<int> n);
 		bigNumber();
-	//	bigNumber(int n);
+		bigNumber(int n);
 		~bigNumber() {};
 
 		int getDigit(int n) {return digits[n];}
@@ -41,11 +43,16 @@ class bigNumber
 		void setNegative() {negative = true;}
 		void setPositive() {negative = false;}
 		
-		bool operator < (bigNumber b);
-		bool operator > (bigNumber b);
-		void operator += (bigNumber b);
-		void operator -= (bigNumber b);
-	//	void operator *= (bigNumber b);
+		bool operator < (bigNumber &b);
+		bool operator > (bigNumber &b);
+		bool operator > (int n);
+		bool operator < (int n);
+		void operator += (bigNumber &b);
+		void operator -= (bigNumber &b);
+		void operator *= (bigNumber &b);
+		void operator --();
+
+		void decrement();
 
 	private:
 		int digits[MAXDIGITS];
@@ -53,17 +60,33 @@ class bigNumber
 		bool negative;
 };
 
-/*
+void bigNumber::operator --()
+{
+	bigNumber temp(1);
+	*this -= temp;
+}
+
 bigNumber::bigNumber(int n)
 {
-    for (int i=0; i<7; i++)
+	for (int i=0; i<MAXDIGITS; i++)
     {
-        digits[i] = n % (10^(i+1))
+        digits[i]=0;
+    }
+    
+    negative = false;
+    for (int i=0; i<20; i++)
+    {
+		int modifier = (pow((double) 10, i+1));
+		int reduced = n % modifier;
+
+		if (i==0)
+			digits[i] = reduced;
+
+		else digits[i] = reduced/(pow((double) 10, i));
     }
 }
-*/
 
-bool bigNumber::operator < (bigNumber b)
+bool bigNumber::operator < (bigNumber &b)
 {
     if (negative==true && b.getNegative()==false)
     {
@@ -83,8 +106,52 @@ bool bigNumber::operator < (bigNumber b)
     return false;
 }
 
-bool bigNumber::operator > (bigNumber b)
+bool bigNumber::operator < (int n)
 {
+	bigNumber b(n);
+
+    if (negative==true && b.getNegative()==false)
+    {
+        return true;
+    }
+    
+    if (digitCount < b.getDigitCount())
+    {
+        return true;
+    }
+    
+    if (digits[digitCount-1] < b.getDigit(digitCount-1))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool bigNumber::operator > (bigNumber &b)
+{
+    if (negative==false && b.getNegative()==true)
+    {
+        return true;
+    }
+    
+    if (digitCount > b.getDigitCount())
+    {
+        return true;
+    }
+    
+    if (digits[digitCount-1] > b.getDigit(digitCount-1))
+    {
+        return true;
+    }
+    
+    return false;
+}
+
+bool bigNumber::operator > (int n)
+{
+	bigNumber b(n);
+
     if (negative==false && b.getNegative()==true)
     {
         return true;
@@ -265,7 +332,7 @@ bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 	return sum;
 }
 
-void bigNumber::operator += (bigNumber b)
+void bigNumber::operator += (bigNumber &b)
 {
     bigNumber temp(addNumbers(*this, b));
     
@@ -275,7 +342,7 @@ void bigNumber::operator += (bigNumber b)
     }
 }
 
-void bigNumber::operator -= (bigNumber b)
+void bigNumber::operator -= (bigNumber &b)
 {
     bigNumber temp(subtractNumbers(*this, b));
     
@@ -283,6 +350,13 @@ void bigNumber::operator -= (bigNumber b)
     {
         digits[i] = temp.getDigit(i);
     }
+}
+
+void bigNumber::decrement()
+{
+	bigNumber temp(1);
+
+	*this -= temp;
 }
 
 bigNumber multiplyNumbersSimple(bigNumber bn1, int n)
@@ -316,21 +390,43 @@ bigNumber multiplyNumbers(bigNumber bn1, bigNumber bn2)
     bn2.setPositive();
     bn2.updateDigits();
     
-    SHOWLINE;
-    
     for (int i=0; i<bn2.getDigitCount(); i++)
     {
-        bigNumber toAdd( multiplyNumbersSimple( multiplyNumbersSimple(bn1, bn2.getDigit(i)) , pow(10, i)) );
+        bigNumber toAdd( multiplyNumbersSimple( multiplyNumbersSimple(bn1, bn2.getDigit(i)) , pow((double)10, (int)i)) );
         temp += toAdd;
     }
  
     return temp;   
 }
 
-bigNumber factorial(bigNumber bn1)
+void bigNumber::operator *= (bigNumber &b)
 {
+    bigNumber temp(multiplyNumbers(*this, b));
     
+    for (int i=0; i<MAXDIGITS-1; i++)
+    {
+        digits[i] = temp.getDigit(i);
+    }
 }
+
+bigNumber factorial(bigNumber bn)
+{
+    bigNumber temp(bn);
+	bigNumber counter(temp);
+
+	temp *= counter;
+	temp *= counter;
+	temp *= counter;
+	temp *= counter;
+	temp *= counter;
+	temp *= counter;
+
+	if (counter < temp)
+		SHOWLINE;
+
+	return temp;
+}
+
 
 int main()
 {
@@ -354,10 +450,10 @@ int main()
 	secondVector.push_back(8);
 	secondVector.push_back(1);
 	secondVector.push_back(3);
-	secondVector.push_back(4);
-	secondVector.push_back(7);
-	secondVector.push_back(7);
+	secondVector.push_back(5);
+	secondVector.push_back(8);
 	secondVector.push_back(3);
+	secondVector.push_back(4);
 	secondVector.push_back(4);
 
 	bigNumber first(firstVector);
@@ -466,9 +562,30 @@ int main()
 	eighth.printNumber();
 	cout << " = ";
 	ninth.printNumber();
-	
-	SHOWLINE;
-	
+
+	bigNumber eleventh(28777932);
+	cout << endl;
+	cout << "eleventh: ";
+	eleventh.printNumber();
+
+	bigNumber thirteenth(4);
+	thirteenth *= bigNumber(7);
+	cout << endl;
+	cout << "thirteenth: ";
+	thirteenth.printNumber();
+
+	bigNumber joe(1);
+	cout << endl;
+	cout << "joe: ";
+	joe.printNumber();
+
+	bigNumber fourteenth(factorial(bigNumber(4)));
+	cout << endl;
+	cout << "fourteenth: ";
+	fourteenth.printNumber();
+
+
+	/*
 	bigNumber tenth(multiplyNumbers(first, second));
 	cout << endl;
 	first.printNumber();
@@ -476,9 +593,11 @@ int main()
 	second.printNumber();
 	cout << " = ";
 	tenth.printNumber();
+	*/
 	
-
 	cout << endl;
+	char response;
+	cin >> response;
 	return 0;
 }
 
