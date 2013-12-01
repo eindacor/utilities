@@ -3,6 +3,7 @@
 #include <math.h>
 
 #define MAXDIGITS 1000
+#define PRECISION 10
 
 #ifdef NOCOMMAS
 #define COMMA 
@@ -35,35 +36,48 @@ class bigNumber
 		~bigNumber() {};    
 
 		int getDigit(int n) {return digits[n];}
+		void setDigit(int n, int s) {digits[n] = s;}
 		int getDigitCount();
+		int getDecimalCount();
 		void printNumber();
 		bool getNegative() {return negative;}
-		int updateDigits();
+		void updateDigits();
+		void adjustPrecision(int n);
+		void query (int n);
 
 		void timesTen (int n);
+		void divideByTen (int n);
 		
 		void setNegative() {negative = true;}
 		void setPositive() {negative = false;}
 		
-		bool operator < (bigNumber b);     //updated
-		bool operator > (bigNumber b);     //updated
-		bool operator > (int n);            //updated
-		bool operator < (int n);            //updated
+		bool operator < (bigNumber b); 
+		bool operator <= (bigNumber b); 
+		bool operator < (int n);
+		bool operator <= (int n);
+
+		bool operator > (bigNumber b);
+		bool operator >= (bigNumber b);
+		bool operator > (int n);
+		bool operator >= (int n);
+
 		bool operator == (bigNumber b); 
 		bool operator == (int n);   
 		bool operator != (bigNumber b);
 		bool operator != (int n); 
+
 		void operator += (bigNumber b);    
 		void operator -= (bigNumber b);
 		void operator *= (bigNumber b);
 		void operator -- (int);
 		void operator = (bigNumber b);
-		bigNumber operator * (bigNumber b); //updated
-		bigNumber operator * (int n);       //updated
-		bigNumber operator + (bigNumber b); //updated
-		bigNumber operator + (int n);       //updated
-		bigNumber operator - (bigNumber b); //updated
-		bigNumber operator - (int n);       //updated
+
+		bigNumber operator * (bigNumber b);
+		bigNumber operator * (int n);
+		bigNumber operator + (bigNumber b);
+		bigNumber operator + (int n);
+		bigNumber operator - (bigNumber b);
+		bigNumber operator - (int n);
 		bigNumber absolute();
 
 		void decrement();
@@ -71,23 +85,31 @@ class bigNumber
 	private:
 		int digits[MAXDIGITS];
 		int digitCount;
+		int decimalCount;
 		bool negative;
 };
 
 void bigNumber::operator = (bigNumber b)
 {
-    int highestDigits=0;
-    if (digitCount < b.getDigitCount())
+	int highestDigits=0;
+	int decimal=0;
+
+	if (digitCount < b.getDigitCount())
         highestDigits = b.getDigitCount();
         
-    else highestDigits = b.getDigitCount()+1;
+	else highestDigits = digitCount;
+
+	if (decimalCount < b.getDecimalCount())
+		decimal = b.getDecimalCount();
+
+	else decimal = decimalCount;
     
-    for (int i=0; i<highestDigits; i++)
-    {
-        digits[i] = b.getDigit(i);
-    }
+	for (int i=(PRECISION-decimal); i<highestDigits; i++)
+	{
+	  digits[i] = b.getDigit(i);
+	}
     
-    updateDigits();
+	updateDigits();
 }
 
 void bigNumber::operator -- (int)
@@ -116,15 +138,17 @@ bigNumber::bigNumber(int n)
 
 		if (i==0)
 		{
-			digits[i] = reduced;
+			digits[i+PRECISION] = reduced;
 		}
 
 		else 
 		{
-			digits[i] = reduced/(pow((double) 10, i));
+			digits[i+PRECISION] = reduced/(pow((double) 10, i));
 		}
+
 	}
 	
+	decimalCount = 0;
 	updateDigits();
 }
 
@@ -180,7 +204,58 @@ bool bigNumber::operator < (bigNumber b)
     
     if (negative==true && b.getNegative()==false)
     {
-        SHOWLINE;
+        return true;
+    }
+    
+    if (negative==false && b.getNegative()==true)
+    {
+        return false;
+    }
+    
+    if (negative==true && b.getNegative()==true)
+    {
+        return ( absolute() > b.absolute() );
+    }
+    
+    if (digitCount < b.getDigitCount())
+    {
+        return true;
+    }
+    
+    if (digitCount > b.getDigitCount())
+    {
+        return false;
+    }
+
+    
+    for (int i=digitCount-1; i>=0; i--)
+    {
+        if (digits[i] < b.getDigit(i))
+        {
+            return true;
+        }
+        
+        if (digits[i] > b.getDigit(i))
+        {
+            return false;
+        }
+    }
+    
+    return false;
+}
+
+bool bigNumber::operator <= (bigNumber b)
+{
+    updateDigits();
+    b.updateDigits();
+    
+    if (*this == b)
+    {
+        return true;
+    }
+    
+    if (negative==true && b.getNegative()==false)
+    {
         return true;
     }
     
@@ -226,6 +301,13 @@ bool bigNumber::operator < (int n)
 	bigNumber b(n);
 	updateDigits(); 
 	return (*this < b);
+}
+
+bool bigNumber::operator <= (int n)
+{
+	bigNumber b(n);
+	updateDigits(); 
+	return (*this <= b);
 }
 
 bool bigNumber::operator > (bigNumber b)
@@ -279,6 +361,57 @@ bool bigNumber::operator > (bigNumber b)
     return false;
 }
 
+bool bigNumber::operator >= (bigNumber b)
+{
+    updateDigits();
+    b.updateDigits();
+    
+    if (*this == b)
+    {
+        return true;
+    }
+    
+    if (negative==false && b.getNegative()==true)
+    {
+        return true;
+    }
+    
+    if (negative==true && b.getNegative()==false)
+    {
+        return false;
+    }
+    
+    if (negative==true && b.getNegative()==true)
+    {
+        return ( absolute() < b.absolute() );
+    }
+    
+    if (digitCount > b.getDigitCount())
+    {
+        return true;
+    }
+    
+    if (digitCount < b.getDigitCount())
+    {
+        return false;
+    }
+    
+    for (int i=digitCount-1; i>=0; i--)
+    {
+        if (digits[i] > b.getDigit(i))
+        {
+            return true;
+        }
+        
+        if (digits[i] < b.getDigit(i))
+        {
+            return false;
+        }
+    }
+    
+    return false;
+}
+
 bool bigNumber::operator > (int n)
 {
 	bigNumber b(n);
@@ -286,22 +419,37 @@ bool bigNumber::operator > (int n)
     return (*this > b);
 }
 
-int bigNumber::updateDigits()
+bool bigNumber::operator >= (int n)
+{
+	bigNumber b(n);
+    updateDigits(); 
+    return (*this >= b);
+}
+
+void bigNumber::updateDigits()
 {
 	for (int i=MAXDIGITS-1; i>0; i--)
    {
    	if (digits[i]>0)
       {
       	digitCount = (i+1);
-         return digitCount;
+			break;
       }	
 	}
 
-	digitCount = 1;
-	if (digits[0] == 0)
-		setPositive();	
+	decimalCount = 0;
 
-   return 1;
+	for (int i=0; i<PRECISION; i++)
+	{
+		if (digits[PRECISION-1-i]>0)
+		{
+			decimalCount = i+1;
+			break;
+		}
+	}
+
+	if (decimalCount==0 && digitCount==(PRECISION+1) && digits[PRECISION]==0)
+		setPositive();
 }
 
 bigNumber::bigNumber()
@@ -311,9 +459,11 @@ bigNumber::bigNumber()
         digits[i]=0;
     }
     
-    updateDigits();
+	decimalCount=0;
+	updateDigits();
 }
 
+/*
 bigNumber::bigNumber(vector<int> n)
 {
 	for (int i=0; i<MAXDIGITS; i++)
@@ -331,6 +481,7 @@ bigNumber::bigNumber(vector<int> n)
 	updateDigits();
 	negative = false;
 }
+*/
 
 int bigNumber::getDigitCount()
 {
@@ -338,44 +489,50 @@ int bigNumber::getDigitCount()
 	return digitCount;
 }
 
+int bigNumber::getDecimalCount()
+{
+	updateDigits();
+	return decimalCount;
+}
+
 void bigNumber::printNumber()
 {
    updateDigits();
 
-	if (digitCount==0)
+	int comma = (digitCount-PRECISION) % 3;
+
+	if (negative==true)
 	{
-       cout << 0;
+		 cout << "-";
 	}
 
-	else
+	for (int i=0; i<(digitCount-(PRECISION-decimalCount)); i++)
 	{
-    
-		int comma = digitCount % 3;
-	
-		if (negative==true)
-			 cout << "-";
-
-		for (int i=0; i<digitCount; i++)
+		if (comma==0 && (digitCount-i) >= PRECISION)
 		{
-			if (comma==0)
+			if (i>0)
 			{
-				 if (i>0)
-				 {
-					 COMMA;
-				 }
-					 
-				comma = 3;
+				COMMA;
 			}
-
-			cout << digits[digitCount-i-1];
-
-			comma--;
+				 
+			comma = 3;
 		}
+
+		if (digitCount-i-1 == (PRECISION-1))
+		{
+			cout << ".";
+		}
+
+		cout << digits[digitCount-i-1];
+
+		comma--;
 	}
 }
 
 bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2)
 {
+	bigNumber sum;
+
     if (bn1.absolute() == bn2.absolute())
     {
         if (bn1.getNegative()==true && bn2.getNegative()==false)
@@ -449,14 +606,20 @@ bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2)
     
 	vector<int> temp;
 	int carry=0;
-	int digits;
+	int digits=0;
+	int decimal=0;
+
+	if (bn1.getDecimalCount() > bn2.getDecimalCount())
+		decimal = bn1.getDecimalCount();
+
+	else decimal = bn2.getDecimalCount();
 
 	if (bn1.getDigitCount() > bn2.getDigitCount())
 		digits = bn1.getDigitCount()+1;
 
 	else digits = bn2.getDigitCount()+1;
 
-	for (int i=0; i<digits; i++)
+	for (int i=(PRECISION-decimal); i<digits+1; i++)
 	{
 		int tempNumber = bn1.getDigit(i) + bn2.getDigit(i);
 		
@@ -473,10 +636,8 @@ bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2)
 			carry = 0;
 		}
 
-		temp.push_back(tempNumber);
+		sum.setDigit(i, tempNumber);
 	}
-
-    bigNumber sum(temp);
     
 	sum.updateDigits();
 	return sum;
@@ -484,6 +645,8 @@ bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2)
 
 bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 {
+	bigNumber sum;
+
     if (bn1.absolute() == bn2.absolute())
     {
         if (bn1.getNegative()==true && bn2.getNegative()==false)
@@ -563,14 +726,20 @@ bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 	  
   	vector<int> temp;
 	int carry=0;
-	int digits;
+	int digits=0;
+	int decimal=0;
+
+	if (bn1.getDecimalCount() > bn2.getDecimalCount())
+		decimal = bn1.getDecimalCount();
+
+	else decimal = bn2.getDecimalCount();
 
 	if (bn1.getDigitCount() > bn2.getDigitCount())
 		digits = bn1.getDigitCount()+1;
 
 	else digits = bn2.getDigitCount()+1;
 
-	for (int i=0; i<digits; i++)
+	for (int i=(PRECISION-decimal); i<digits+1; i++)
 	{
 		int tempNumber = bn1.getDigit(i) - bn2.getDigit(i);
 		
@@ -587,36 +756,21 @@ bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 			carry = 0;
 		}
 
-		temp.push_back(tempNumber);
+		sum.setDigit(i, tempNumber);
 	}
 
-   bigNumber sum(temp);
    sum.updateDigits();
 	return sum;
 }
 
 void bigNumber::operator += (bigNumber b)
 {
-    bigNumber temp(addNumbers(*this, b));
-    
-    for (int i=0; i<MAXDIGITS-1; i++)
-    {
-        digits[i] = temp.getDigit(i);
-    }
-
-	updateDigits();
+	*this = *this + b;
 }
 
 void bigNumber::operator -= (bigNumber b)
 {
-    bigNumber temp(subtractNumbers(*this, b));
-    
-    for (int i=0; i<MAXDIGITS-1; i++)
-    {
-        digits[i] = temp.getDigit(i);
-    }
-
-	updateDigits();
+	*this = *this - b;
 }
 
 void bigNumber::decrement()
@@ -629,12 +783,10 @@ void bigNumber::decrement()
 }
 
 bigNumber multiplyNumbersSimple(bigNumber bn1, int n)
-{
-    
+{  
     if (n==0)
     {
     		bigNumber zero;
-			zero.updateDigits();
        	return zero;
     }
     
@@ -658,11 +810,12 @@ bigNumber multiplyNumbers(bigNumber &bn1, bigNumber &bn2)
 {
    bigNumber temp(0);
 	
-	int counter = bn2.getDigitCount();
+	int counter = (bn2.getDigitCount()-(PRECISION-bn2.getDecimalCount()));
+	DECLARE(counter);
 	for (int i=0; i<counter; i++)
 	{
-		int multiplier = pow((double) 10, (int) i);
-		bigNumber toAdd = multiplyNumbersSimple(bn1.absolute(), bn2.getDigit(i));
+		int toMultiply = (PRECISION-bn2.getDecimalCount()) + i;
+		bigNumber toAdd = multiplyNumbersSimple(bn1.absolute(), bn2.getDigit(toMultiply) );
 		toAdd.timesTen(i);
 		temp += toAdd;
 	}
@@ -672,6 +825,8 @@ bigNumber multiplyNumbers(bigNumber &bn1, bigNumber &bn2)
         temp.setNegative();
 	}
 
+	temp.divideByTen(bn2.getDecimalCount());
+
 	temp.updateDigits();
 	return temp;   
 }
@@ -680,14 +835,32 @@ void bigNumber::timesTen(int n)
 {
 	for (int i=0; i<n; i++)
 	{
-		for (int c=0; c<digitCount; c++)
+		for (int c=0; c<digitCount-(PRECISION-decimalCount); c++)
 		{
 			digits[digitCount-c] = digits[digitCount-1-c];
 		}
 
-		digits[0] = 0;
+		digits[PRECISION-decimalCount] = 0;
 		updateDigits();
 	}
+}
+
+void bigNumber::divideByTen(int n)
+{
+	int start=0;
+
+	if (decimalCount!=PRECISION)
+		start = PRECISION-decimalCount-1;
+			
+	for (int i=0; i<n; i++)
+	{
+		for (int c=start; c<digitCount; c++)
+		{
+			digits[c] = digits[c+1];
+		}
+	}
+
+	updateDigits();
 }
 
 bigNumber bigNumber::operator * (bigNumber b)
@@ -725,12 +898,7 @@ bigNumber bigNumber:: operator - (int n)
 
 void bigNumber::operator *= (bigNumber b)
 {
-    bigNumber temp(multiplyNumbers(*this, b));
-    
-    for (int i=0; i<MAXDIGITS-1; i++)
-    {
-        digits[i] = temp.getDigit(i);
-    }
+	*this = *this * b;
 }
 
 bigNumber factorial(bigNumber bn)
@@ -739,6 +907,7 @@ bigNumber factorial(bigNumber bn)
 
     for (bigNumber counter(bn); counter > (int) 1 ; counter--)
     {
+
         if (bn > counter)
         {
             temp *= counter;
@@ -757,29 +926,61 @@ bigNumber bigNumber::absolute()
     return temp;
 }
 
-void testMultiply(bigNumber bn1, bigNumber bn2)
+int divideNumbersSimple (bigNumber bn1, bigNumber bn2)
 {
-	bigNumber temp = bn1 * bn2;
-	bn1.printNumber();
-	cout << " * ";
-	bn2.printNumber();
-	cout << " = ";
-	temp.printNumber();
+	int temp=0;
+	
+	while (bn1 >= bn2)
+	{
+		bn1-=bn2;
+		temp++;
+	}
+
+	return temp;
+}
+
+void bigNumber::query (int n)
+{
+	for (int i=0; i<n; i++)
+	{
+		if ((n-i-1)==(PRECISION-1))
+			cout << ".";
+
+		cout << digits[n-i-1];
+	}
+	
 	cout << endl;
 }
 
 int main()
 {
-	bigNumber fact = factorial(bigNumber(365));
+	bigNumber test1(987654321);
+	bigNumber test2(123456789);
 
-	fact.printNumber();
-	cout << endl << fact.getDigitCount();
+	cout << endl;
+	test1.printNumber();
+	cout << " * ";
+	test2.printNumber();
+	cout << " = ";
+	(test1*test2).printNumber();
 
-	cout << endl << endl;
+	cout << endl;
+	test1.printNumber();
+	cout << " + ";
+	test2.printNumber();
+	cout << " = ";
+	(test1+test2).printNumber();
 
-	bigNumber multiplied = bigNumber(123456789) * bigNumber(987654321);
-	multiplied.printNumber();
-	cout << endl << multiplied.getDigitCount();
+	cout << endl;
+	test1.printNumber();
+	cout << " - ";
+	test2.printNumber();
+	cout << " = ";
+	(test1-test2).printNumber();
+
+	cout << endl;
+	test1 -= test2;
+	test1.printNumber();
 
 	cout << endl;
 	return 0;
