@@ -58,6 +58,15 @@ class bigNumber
 		bigNumber operator - (int n);
 		bigNumber absolute();
 		bigNumber noDecimal();
+		
+		static bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2);
+        static bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2);
+        static bigNumber multiplyNumbersSimple(bigNumber bn1, int n);
+        static bigNumber multiplyNumbers(bigNumber &bn1, bigNumber &bn2);
+        static int divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r);
+        static bigNumber divideNumbers(bigNumber bn1, bigNumber bn2);
+        static bigNumber factorial(bigNumber bn);
+        static bigNumber iterations(bigNumber bn1, bigNumber bn2);
 
 		void decrement();
 

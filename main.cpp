@@ -12,7 +12,7 @@ int main()
 
 	bigNumber test5(n);
 	bigNumber test6(r);
-	bigNumber itTest = iterations(test5, test6);
+	bigNumber itTest = bigNumber::iterations(test5, test6);
 	cout << n << "c" << r << " = ";
 	itTest.printNumber();
 	cout << endl;
