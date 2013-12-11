@@ -391,7 +391,6 @@ bigNumber bigNumber::iterations(bigNumber bn1, bigNumber bn2)
 	return temp;
 }
 
-
 void bigNumber::printStats()
 {
 	cout << endl << "digitCount=" << digitCount << " ; decimalCount=" << decimalCount << " ; ";
@@ -784,7 +783,6 @@ bigNumber::bigNumber()
 	updateDigits();
 }
 
-/*
 bigNumber::bigNumber(vector<int> n)
 {
 	for (int i=0; i<MAXDIGITS; i++)
@@ -802,7 +800,6 @@ bigNumber::bigNumber(vector<int> n)
 	updateDigits();
 	negative = false;
 }
-*/
 
 int bigNumber::getDigitCount()
 {
@@ -857,6 +854,14 @@ int bigNumber::printNumber()
 	}
 
 	return 1;
+}
+
+void bigNumber::printPercent()
+{
+    bigNumber temp = *this;
+    temp.timesTen(2);
+    temp.printNumber();
+    cout << "%";
 }
 
 void bigNumber::operator += (bigNumber b)

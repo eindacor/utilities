@@ -1,6 +1,8 @@
 #ifndef BIGNUM_DECS_H
 #define BIGNUM_DECS_H
 
+enum PTYPE {ERROR, ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, LESSTHAN, LESSTHANEQUALS, GREATERTHAN, GREATERTHANEQUALS, EQUALS, FACTORIAL, ITERATION};
+
 class bigNumber
 {
 	public:
@@ -14,6 +16,7 @@ class bigNumber
 		int getDigitCount();
 		int getDecimalCount();
 		int printNumber();
+		void printPercent();
 		void printStats();
 		bool getNegative() {return negative;}
 		void updateDigits();
@@ -75,6 +78,35 @@ class bigNumber
 		int digitCount;
 		int decimalCount;
 		bool negative;
+};
+
+class extracted
+{
+    public:
+        extracted(bigNumber bn, int n): stored(bn), error(n) {};
+        ~extracted(){};
+        
+        bigNumber getStored() {return stored;}
+        int getError() {return error;}
+    
+    private:
+        bigNumber stored;
+        PTYPE pType;
+        int error;
+};
+
+class solution
+{
+    public:
+        solution(bigNumber bn, int n): solved(bn), error(n) {};
+        ~solution(){};
+        
+        bigNumber getSolved() {return solved;}
+        int getError() {return error;}
+    
+    private:
+        bigNumber solved;
+        int error;
 };
 
 #endif
