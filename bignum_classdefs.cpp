@@ -391,6 +391,30 @@ bigNumber bigNumber::iterations(bigNumber bn1, bigNumber bn2)
 	return temp;
 }
 
+bigNumber bigNumber::exponent(bigNumber bn1, bigNumber bn2)
+{
+    bigNumber counter = bn2.absolute();
+    bigNumber temp = bn1;
+    
+    if (bn2 == 0)
+    {
+        return bigNumber(1);
+    }
+    
+    while (counter > 1)
+    {
+        temp *= bn1;
+        counter--;
+    }
+    
+    if (bn2.getNegative())
+    {
+        temp = bigNumber(1) / temp;
+    }
+    
+    return temp;
+}
+
 void bigNumber::printStats()
 {
 	cout << endl << "digitCount=" << digitCount << " ; decimalCount=" << decimalCount << " ; ";
@@ -420,6 +444,8 @@ void bigNumber::operator = (bigNumber b)
 	{
 	  digits[i] = b.getDigit(i);
 	}
+    
+    negative = b.getNegative();
     
 	updateDigits();
 }

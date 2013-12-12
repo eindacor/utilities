@@ -70,6 +70,7 @@ class bigNumber
         static bigNumber divideNumbers(bigNumber bn1, bigNumber bn2);
         static bigNumber factorial(bigNumber bn);
         static bigNumber iterations(bigNumber bn1, bigNumber bn2);
+        static bigNumber exponent(bigNumber bn1, bigNumber bn2);
 
 		void decrement();
 
