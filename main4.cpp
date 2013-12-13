@@ -424,30 +424,53 @@ solution solve(string &c, bigNumber previous, settings &user)
 void modifySettings(settings &user)
 {
     cout << endl;
-    int setI=0;
+    string setI;
     string setS;
-    for (;;)
+    bool invalid=false;
+    int intSet=0;
+    
+    do
     {
+        invalid=false;
+        setI.clear();
+        //cin.ignore(MAXENTERED, '\n');
+        
         cout << "Enter desired precision: ";
-        cin >> setI;
+        std::getline(cin, setI);
         
-        if (setI>PRECISION)
+        for (int i=0; i<setI.size(); i++)
         {
-            cout << "Invalid entry (precision is too high)" << endl << endl;
-            continue;
+            if (isNumber(setI[i]) == false)
+            {
+                cout << "Invalid entry" << endl << endl;
+                invalid=true;
+                break;
+            }
+            
+            else intSet += (checkNumber(setI[i]) * (10^i));
         }
         
-        else 
+        cout << "intSet: " << intSet << endl;
+        
+        if (invalid==false)
         {
-            user.setRound(setI);
-            break;
+            if (intSet>PRECISION)
+            {
+                cout << "Invalid entry (precision is too high)" << endl << endl;
+                invalid=true;
+            }
+            
+            else 
+            {
+                user.setRound(intSet);
+            }
         }
-    }
+    } while (invalid==true);
     
     for (;;)
     {
-        cin.clear();
-        cin.ignore(MAXENTERED, '\n');
+        setS.clear();
+        //cin.ignore(MAXENTERED, '\n');
         
         setS.clear();
         

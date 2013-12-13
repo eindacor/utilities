@@ -5,6 +5,7 @@
 #include <vector>
 #include <math.h>
 #include <string>
+#include <stdlib.h>
 
 using std::cout;
 using std::cin;
