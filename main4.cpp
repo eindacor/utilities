@@ -4,6 +4,9 @@
 
 #define MAXENTERED 256
 
+//change checkSymbol() etc. to getSymbol()
+//change checkNumber() to getNumber()
+
 
 PTYPE checkSymbol(char &c)
 {
@@ -57,6 +60,16 @@ bool checkSpace(char &c)
     return (c == ' ');
 }
 
+bool isNumber(char &c)
+{
+	return (checkNumber(c) >= 0 && checkNumber(c) <= 9);
+}
+
+bool isSymbol(char &c)
+{
+	return (checkSymbol(c) != ERROR);
+}
+
 solution solve(string &c, bigNumber previous)
 {
     c += '@';
@@ -80,6 +93,14 @@ solution solve(string &c, bigNumber previous)
     
     for (int i=0; i<c.size(); i++)
     {
+			/*
+			if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false)
+			{
+				cout << "c[i]: " << c[i];
+				return solution(temp, 1);
+			}
+			*/
+
         //if it's a space, and is preceeded by a number, number is complete
         if (checkSpace(c[i])==true && checkNumber(c[i-1]) >= 0 && checkNumber(c[i-1]) <= 9)
         {
@@ -89,6 +110,8 @@ solution solve(string &c, bigNumber previous)
         //if it's a space, negative is set, and it is preceeded by a minus symbol, return error
         if (checkSpace(c[i])==true && checkSymbol(c[i-1]) == SUBTRACT && negative == true)
         {
+				SHOWLINE;
+				SHOWNUMBER(temp);
             return solution(temp, 1);
         }
         
@@ -98,16 +121,24 @@ solution solve(string &c, bigNumber previous)
             
             //if number was complete, return error
             if (done==true)
-                return solution(temp, 1);
+				{
+					SHOWLINE;
+					SHOWNUMBER(temp);	
+               return solution(temp, 1);
+				}
                 
             //otherwise add number to target vector, add decimal count if needed
             else 
             {
+					DECLARE(c[i]);
                 (*targetVec).push_back(checkNumber(c[i]));
                 numbers++;
                 
                 if (decimal==true)
+					 {
                     (*targetDec)++;
+							DECLARE(*targetDec);
+					 }
             }
         }
         
@@ -138,7 +169,12 @@ solution solve(string &c, bigNumber previous)
                     decimal=false;
                 }
                 
-                else return solution(temp, 1);
+                else 
+					 {
+						SHOWLINE;
+						SHOWNUMBER(temp);
+						return solution(temp, 1);
+					 }
             }
             
             //if numbers have been added, and the target is the first number, the problem type is subtraction
@@ -155,15 +191,25 @@ solution solve(string &c, bigNumber previous)
             }
             
             //if numbers have been added, and the target is the second number, return error
-            else return solution(temp, 1);
+            else 
+				{
+					SHOWLINE;
+					SHOWNUMBER(temp);
+					return solution(temp, 1);
+				}
         }
         
         //if it's a symbol other than minus
-        else  if (checkSymbol(c[i]) != ERROR && checkSymbol(c[i]) != SUBTRACT)
+        else if (checkSymbol(c[i]) != ERROR && checkSymbol(c[i]) != SUBTRACT)
         {
             //if the type is already established, return error
-            if (pType != ERROR || negative==true)
+            if (pType != ERROR)
+				{
+					SHOWLINE;
+					DECLARE(c[i]);
+					SHOWNUMBER(temp);
                 return solution(temp, 1);
+				}
                 
             //otherwise, set problem type based on symbol and reset figures
             else 
@@ -184,7 +230,11 @@ solution solve(string &c, bigNumber previous)
         {
             //if there's already been a decimal point, return error
             if (decimal==true)
+				{
+					SHOWLINE;
+					SHOWNUMBER(temp);
                 return solution(temp, 1);
+				}
                 
             else decimal = true;
         }
@@ -200,11 +250,16 @@ solution solve(string &c, bigNumber previous)
                     int numberToUse = second.at(second.size()-n-1);
                     int locationToSet = PRECISION + n;
                     bn2.setDigit(locationToSet, numberToUse);
+							SHOWLINE;
+							SHOWNUMBER(bn2);
                     bn2.divideByTen(decimalCount2);
+							SHOWNUMBER(bn2);
                 }
                 
                 temp = previous - bn2;
-                SHOW(cout << endl << "previous: "; previous.printNumber(); cout << "\nbn2: "; bn2.printNumber(); cout << endl);
+                SHOWLINE;
+					 SHOWNUMBER(temp);
+						cout << "Entered: "; previous.printNumber(); cout << " - "; bn2.printNumber();
                 return solution(temp, 0);
             }
             
@@ -218,10 +273,17 @@ solution solve(string &c, bigNumber previous)
                 for (int n=0; n<first.size(); n++)
                 {
                     int numberToUse = first.at(first.size()-n-1);
+							DECLARE(numberToUse);
                     int locationToSet = PRECISION + n;
+							DECLARE(locationToSet);
                     bn1.setDigit(locationToSet, numberToUse);
-                    bn1.divideByTen(decimalCount1);
+							SHOWLINE;
+							SHOWNUMBER(bn1);
                 }
+					SHOWLINE;
+					SHOWNUMBER(bn1);
+					bn1.divideByTen(decimalCount1);
+					SHOWNUMBER(bn1);
             }
             
             //if second number is empty
@@ -232,15 +294,24 @@ solution solve(string &c, bigNumber previous)
                 {
                     if (bn1<0)
                     {
+								SHOWLINE;
+								SHOWNUMBER(temp);
+								bn1.printNumber(); cout << "!";
                         return solution(temp, 1);
                     }
                     
                     else if (bn1==0)
                     {
+								SHOWLINE;
+								SHOWNUMBER(temp);
+								bn1.printNumber(); cout << "!";
                         return solution(bigNumber(1), 0);
                     }
                     
                     temp = bigNumber::factorial(bn1);
+							SHOWLINE;
+							SHOWNUMBER(temp);
+							bn1.printNumber(); cout << "!";
                     return solution(temp, 0);
                 }
                 
@@ -252,10 +323,17 @@ solution solve(string &c, bigNumber previous)
                         int numberToUse = first.at(first.size()-n-1);
                         int locationToSet = PRECISION + n;
                         bn1.setDigit(locationToSet, numberToUse);
-                        bn1.divideByTen(decimalCount1);
                     }
+
+							SHOWLINE;
+							SHOWNUMBER(bn1);
+							bn1.divideByTen(decimalCount1);
+							SHOWNUMBER(bn1);
                     
                     temp = previous - bn1.absolute();
+							SHOWLINE;
+							SHOWNUMBER(temp);
+							cout << "Entered: "; previous.printNumber(); cout << " - "; bn1.absolute().printNumber();
                     return solution(temp, 0);
                 }
                 
@@ -264,6 +342,9 @@ solution solve(string &c, bigNumber previous)
                 {
                     if (first.size()==0)
                     {
+								SHOWLINE;
+								SHOWNUMBER(previous);
+								cout << "Entered: "; bn1.printNumber(); cout << " + "; bn2.printNumber();
                         return solution(previous, 0);
                     }
                     
@@ -274,14 +355,26 @@ solution solve(string &c, bigNumber previous)
                             int numberToUse = first.at(first.size()-n-1);
                             int locationToSet = PRECISION + n;
                             bn1.setDigit(locationToSet, numberToUse);
-                            bn1.divideByTen(decimalCount1);
                         }
+
+								SHOWLINE;
+								SHOWNUMBER(bn1);
+								bn1.divideByTen(decimalCount1);
+								SHOWNUMBER(bn1);
                     }
                     
+							SHOWLINE;
+							SHOWNUMBER(bn1);
+							cout << "Entered: "; bn1.printNumber();
                     return solution(bn1, 0);
                 }
                 
-                else return solution(temp, 1);
+                else 
+					 {
+							SHOWLINE;
+							SHOWNUMBER(temp);
+							return solution(temp, 1);
+					 }
             }
                 
             //otherwise take ints from vector and use to set bigNumber2
@@ -292,26 +385,33 @@ solution solve(string &c, bigNumber previous)
                     int numberToUse = second.at(second.size()-n-1);
                     int locationToSet = PRECISION + n;
                     bn2.setDigit(locationToSet, numberToUse);
-                    bn2.divideByTen(decimalCount2);
                 }
+
+					SHOWLINE;
+					SHOWNUMBER(bn2);
+					bn2.divideByTen(decimalCount2);
+					SHOWNUMBER(bn2);
             }
             
-            SHOW(cout << endl << "bn1: "; bn1.printNumber(); cout << "\nbn2: "; bn2.printNumber(); cout << endl);
+
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
             {
                 case ERROR: return solution(temp, 1);
                 
-                case ADD: temp = bn1 + bn2;
+                case ADD: cout << "Entered: "; bn1.printNumber(); cout << " + "; bn2.printNumber();
+								temp = bn1 + bn2;
                         return solution(temp, 0);
                 
-                case SUBTRACT: temp = bn1 - bn2;
+                case SUBTRACT: cout << "Entered: "; bn1.printNumber(); cout << " - "; bn2.printNumber();
+								temp = bn1 - bn2;
                         return solution(temp, 0);
                         
-                case MULTIPLY: temp = bn1 * bn2;
+                case MULTIPLY: cout << "Entered: "; bn1.printNumber(); cout << " * "; bn2.printNumber();
+								temp = bn1 * bn2;
                         return solution(temp, 0);      
                         
-                case DIVIDE: 
+                case DIVIDE: cout << "Entered: "; bn1.printNumber(); cout << " / "; bn2.printNumber();
                         if (bn2==0)
                         {
                             return solution(temp,1);
@@ -321,10 +421,12 @@ solution solve(string &c, bigNumber previous)
                         
                 case FACTORIAL: return solution(temp, 1);    
                    
-                case EXPONENT: temp = bigNumber::exponent(bn1, bn2);
+                case EXPONENT: cout << "Entered: "; bn1.printNumber(); cout << "^"; bn2.printNumber();
+								temp = bigNumber::exponent(bn1, bn2);
                         return solution(temp, 0);
                 
-                case ITERATION: temp = bigNumber::iterations(bn1, bn2);
+                case ITERATION: cout << "Entered: "; bn1.printNumber(); cout << "c"; bn2.printNumber();
+								temp = bigNumber::iterations(bn1, bn2);
                         return solution(temp, 0);
                 
                 default: return solution(temp, 1);
@@ -335,20 +437,21 @@ solution solve(string &c, bigNumber previous)
 
 int main()
 {
-    string entered;
+	 string entered;
     PTYPE problemType = ERROR;
     bool exit = false;
     bigNumber previous;
     
     while (exit == false)
-    {
-        
+    {      
         entered.clear();
 
         previous.printNumber();
         cout << "\n";
         
         std::getline(cin, entered);
+
+			cout << "-----------------------" << endl;
         
         if (entered != "exit" && entered != "EXIT" && entered != "Exit")
         {
@@ -356,7 +459,7 @@ int main()
         
             if (answer.getError()>0)
             {
-                cout << "There has been an error";
+                cout << "Invalid Input";
             }
             
             else 

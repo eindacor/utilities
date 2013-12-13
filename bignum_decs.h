@@ -12,7 +12,7 @@ class bigNumber
 		~bigNumber() {};    
 
 		int getDigit(int n) {return digits[n];}
-		void setDigit(int n, int s) {digits[n] = s;}
+		void setDigit(int n, int s) {digits[n] = s; updateDigits();}
 		int getDigitCount();
 		int getDecimalCount();
 		int printNumber();

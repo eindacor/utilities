@@ -926,14 +926,13 @@ void bigNumber::timesTen(int n)
 
 void bigNumber::divideByTen(int n)
 {
-	int start=0;
 
-	if (decimalCount!=PRECISION)
-		start = PRECISION-decimalCount-1;
-			
-	for (int i=0; i<n; i++)
+	for (int i=n; i>0; i--)
 	{
-		for (int c=start; c<digitCount; c++)
+		if (digits[0]>4)
+			digits[0] = digits[1] + 1;
+
+		for (int c=1; c<digitCount; c++)
 		{
 			digits[c] = digits[c+1];
 		}
