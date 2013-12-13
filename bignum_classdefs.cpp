@@ -456,6 +456,12 @@ void bigNumber::operator -- (int)
 	*this -= temp;
 }
 
+void bigNumber::operator ++ (int)
+{
+	bigNumber temp(1);
+	*this += temp;
+}
+
 bigNumber::bigNumber(int n)
 {
 	negative = (n<0);
@@ -859,7 +865,9 @@ int bigNumber::printNumber()
 
 	for (int i=0; i<(digitCount-(PRECISION-decimalCount)); i++)
 	{
-		if (digitCount-i-1 == (PRECISION-1))
+	    int target = digitCount-i-1;
+	    
+		if (target == (PRECISION-1))
 		{
 			cout << ".";
 		}
@@ -874,7 +882,71 @@ int bigNumber::printNumber()
 			comma = 3;
 		}
 
-		cout << digits[digitCount-i-1];
+		cout << digits[target];
+
+		comma--;
+	}
+
+	return 1;
+}
+
+int bigNumber::printNumber(int n)
+{
+    if (n>PRECISION)
+    {
+        cout << "Requested accuracy is too precise";
+        return 0;
+    }
+    
+	bigNumber temp;
+	if (*this==temp)
+	{
+		cout << 0;
+		return 0;
+	}
+
+   updateDigits();
+
+	int comma = (digitCount-PRECISION) % 3;
+
+	if (negative==true)
+	{
+		 cout << "-";
+	}
+
+    int toUse=n;
+    if (decimalCount<n)
+        toUse = decimalCount;
+        
+    int toPrint = digitCount-(PRECISION-toUse);
+	for (int i=0; i<toPrint; i++)
+	{
+	    int target = digitCount-i-1;
+	    
+		if (target == (PRECISION-1))
+		{
+			cout << ".";
+		}
+
+		else if (comma==0 && (digitCount-i) >= PRECISION)
+		{
+			if (i>0)
+			{
+				COMMA;
+			}
+				 
+			comma = 3;
+		}
+
+        if (i == toPrint-1 && target > 0 && digits[target-1] > 4)
+        {
+            cout << (digits[target]+1);
+        }
+            
+        else
+        {
+		    cout << digits[target];
+        }
 
 		comma--;
 	}
@@ -887,6 +959,14 @@ void bigNumber::printPercent()
     bigNumber temp = *this;
     temp.timesTen(2);
     temp.printNumber();
+    cout << "%";
+}
+
+void bigNumber::printPercent(int n)
+{
+    bigNumber temp = *this;
+    temp.timesTen(2);
+    temp.printNumber(n);
     cout << "%";
 }
 
@@ -995,6 +1075,28 @@ void bigNumber::operator /= (bigNumber b)
 	*this = *this / b;
 }
 
+bigNumber bigNumber::fibonacci(bigNumber b)
+{
+    bigNumber counter;
+    bigNumber high(1);
+    bigNumber low(1);
+    
+    while (counter < (b-2))
+    {
+        bigNumber temp = high;
+        high += low;
+        low = temp;
+        counter++;
+    }
+    return high;
+}
+
+bigNumber bigNumber::fibonacci(int n)
+{
+    bigNumber temp(n);
+    return fibonacci(temp);
+}
+
 bigNumber bigNumber::absolute()
 {
     bigNumber temp = *this;
@@ -1021,4 +1123,14 @@ void bigNumber::query (int n)
 	}
 	
 	cout << endl;
+}
+
+void settings::setRound(int n)
+{
+    if (n>PRECISION)
+    {
+        cout << "Cannot satisfy request" << endl;
+    }
+    
+    else round = n;
 }

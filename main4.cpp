@@ -70,7 +70,7 @@ bool isSymbol(char &c)
 	return (checkSymbol(c) != ERROR);
 }
 
-solution solve(string &c, bigNumber previous)
+solution solve(string &c, bigNumber previous, settings &user)
 {
     c += '@';
     PTYPE pType=ERROR;
@@ -93,10 +93,10 @@ solution solve(string &c, bigNumber previous)
     
     for (int i=0; i<c.size(); i++)
     {
-			if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false && c[i] != '@')
-			{
-				return solution(temp, 1);
-			}
+		if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false && c[i] != '@' && c[i] != '.')
+		{
+			return solution(temp, 1);
+		}
 			
         //if it's a space, and is preceeded by a number, number is complete
         if (checkSpace(c[i])==true && checkNumber(c[i-1]) >= 0 && checkNumber(c[i-1]) <= 9)
@@ -107,8 +107,6 @@ solution solve(string &c, bigNumber previous)
         //if it's a space, negative is set, and it is preceeded by a minus symbol, return error
         if (checkSpace(c[i])==true && checkSymbol(c[i-1]) == SUBTRACT && negative == true)
         {
-				SHOWLINE;
-				SHOWNUMBER(temp);
             return solution(temp, 1);
         }
         
@@ -119,23 +117,19 @@ solution solve(string &c, bigNumber previous)
             //if number was complete, return error
             if (done==true)
 				{
-					SHOWLINE;
-					SHOWNUMBER(temp);	
-               return solution(temp, 1);
+                    return solution(temp, 1);
 				}
                 
             //otherwise add number to target vector, add decimal count if needed
             else 
             {
-					DECLARE(c[i]);
                 (*targetVec).push_back(checkNumber(c[i]));
                 numbers++;
                 
                 if (decimal==true)
-					 {
+				{
                     (*targetDec)++;
-							DECLARE(*targetDec);
-					 }
+				}
             }
         }
         
@@ -222,15 +216,13 @@ solution solve(string &c, bigNumber previous)
             }
         }
         
-         //if it's a decimal point
+        //if it's a decimal point
         else if (c[i]=='.')
         {
             //if there's already been a decimal point, return error
             if (decimal==true)
 				{
-					SHOWLINE;
-					SHOWNUMBER(temp);
-                return solution(temp, 1);
+                    return solution(temp, 1);
 				}
                 
             else decimal = true;
@@ -247,22 +239,24 @@ solution solve(string &c, bigNumber previous)
                     int numberToUse = second.at(second.size()-n-1);
                     int locationToSet = PRECISION + n;
                     bn2.setDigit(locationToSet, numberToUse);
-							SHOWLINE;
-							SHOWNUMBER(bn2);
                     bn2.divideByTen(decimalCount2);
-							SHOWNUMBER(bn2);
                 }
                 
                 temp = previous - bn2;
-                SHOWLINE;
-					 SHOWNUMBER(temp);
-						cout << "Entered: "; previous.printNumber(); cout << " - "; bn2.printNumber();
+			    cout << "Entered: "; 
+			    if (user.getPercent())
+			        previous.printPercent(user.getRound());
+			    
+		        else previous.printNumber(user.getRound());
+				cout << " - "; bn2.printNumber();
                 return solution(temp, 0);
             }
             
+            /* RELOCATING TO ALLOW ROUNDING OF PREVIOUS NUMBER
             //if first number is empty, set first number to previous
             if (first.size()==0)
                 bn1 = previous;
+            */
                 
             //otherwise take ints from vector and use to set bigNumber1
             else 
@@ -270,17 +264,11 @@ solution solve(string &c, bigNumber previous)
                 for (int n=0; n<first.size(); n++)
                 {
                     int numberToUse = first.at(first.size()-n-1);
-							DECLARE(numberToUse);
                     int locationToSet = PRECISION + n;
-							DECLARE(locationToSet);
                     bn1.setDigit(locationToSet, numberToUse);
-							SHOWLINE;
-							SHOWNUMBER(bn1);
                 }
-					SHOWLINE;
-					SHOWNUMBER(bn1);
-					bn1.divideByTen(decimalCount1);
-					SHOWNUMBER(bn1);
+				
+				bn1.divideByTen(decimalCount1);
             }
             
             //if second number is empty
@@ -291,24 +279,17 @@ solution solve(string &c, bigNumber previous)
                 {
                     if (bn1<0)
                     {
-								SHOWLINE;
-								SHOWNUMBER(temp);
-								bn1.printNumber(); cout << "!";
-                        return solution(temp, 1);
+						return solution(temp, 1);
                     }
                     
                     else if (bn1==0)
                     {
-								SHOWLINE;
-								SHOWNUMBER(temp);
-								bn1.printNumber(); cout << "!";
+						bn1.printNumber(); cout << "!";
                         return solution(bigNumber(1), 0);
                     }
                     
                     temp = bigNumber::factorial(bn1);
-							SHOWLINE;
-							SHOWNUMBER(temp);
-							bn1.printNumber(); cout << "!";
+					bn1.printNumber(); cout << "!";
                     return solution(temp, 0);
                 }
                 
@@ -322,15 +303,16 @@ solution solve(string &c, bigNumber previous)
                         bn1.setDigit(locationToSet, numberToUse);
                     }
 
-							SHOWLINE;
-							SHOWNUMBER(bn1);
-							bn1.divideByTen(decimalCount1);
-							SHOWNUMBER(bn1);
+					bn1.divideByTen(decimalCount1);
                     
                     temp = previous - bn1.absolute();
-							SHOWLINE;
-							SHOWNUMBER(temp);
-							cout << "Entered: "; previous.printNumber(); cout << " - "; bn1.absolute().printNumber();
+                    
+					cout << "Entered: "; 
+    			    if (user.getPercent())
+    			        previous.printPercent(user.getRound());
+    			    
+    		        else previous.printNumber(user.getRound());
+    		        cout << " - "; bn1.absolute().printNumber();
                     return solution(temp, 0);
                 }
                 
@@ -339,9 +321,11 @@ solution solve(string &c, bigNumber previous)
                 {
                     if (first.size()==0)
                     {
-								SHOWLINE;
-								SHOWNUMBER(previous);
-								cout << "Entered: "; bn1.printNumber(); cout << " + "; bn2.printNumber();
+						cout << "Entered: ";
+						if (user.getPercent())
+    			        previous.printPercent(user.getRound());
+    			    
+    		            else previous.printNumber(user.getRound());
                         return solution(previous, 0);
                     }
                     
@@ -353,25 +337,18 @@ solution solve(string &c, bigNumber previous)
                             int locationToSet = PRECISION + n;
                             bn1.setDigit(locationToSet, numberToUse);
                         }
-
-								SHOWLINE;
-								SHOWNUMBER(bn1);
-								bn1.divideByTen(decimalCount1);
-								SHOWNUMBER(bn1);
+                        
+						bn1.divideByTen(decimalCount1);
                     }
                     
-							SHOWLINE;
-							SHOWNUMBER(bn1);
-							cout << "Entered: "; bn1.printNumber();
+					cout << "Entered: "; bn1.printNumber();
                     return solution(bn1, 0);
                 }
                 
                 else 
-					 {
-							SHOWLINE;
-							SHOWNUMBER(temp);
-							return solution(temp, 1);
-					 }
+                {
+                    return solution(temp, 1);
+                }
             }
                 
             //otherwise take ints from vector and use to set bigNumber2
@@ -384,47 +361,59 @@ solution solve(string &c, bigNumber previous)
                     bn2.setDigit(locationToSet, numberToUse);
                 }
 
-					SHOWLINE;
-					SHOWNUMBER(bn2);
-					bn2.divideByTen(decimalCount2);
-					SHOWNUMBER(bn2);
+				bn2.divideByTen(decimalCount2);
             }
             
-
+            //if first number is empty, set bn1 to previous and print rounded previous
+            if (first.size()==0)
+            {
+                cout << "Entered: ";
+                if (user.getPercent())
+                    previous.printPercent(user.getRound());
+                
+                else previous.printNumber(user.getRound());
+                bn1 = previous;
+            }
+            //otherwise print exactly what was entered
+            else 
+            {   
+                cout << "Entered: "; bn1.printNumber(); 
+            }
+            
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
             {
                 case ERROR: return solution(temp, 1);
                 
-                case ADD: cout << "Entered: "; bn1.printNumber(); cout << " + "; bn2.printNumber();
-								temp = bn1 + bn2;
-                        return solution(temp, 0);
+                case ADD: cout << " + "; bn2.printNumber();
+                    temp = bn1 + bn2;
+                    return solution(temp, 0);
                 
-                case SUBTRACT: cout << "Entered: "; bn1.printNumber(); cout << " - "; bn2.printNumber();
-								temp = bn1 - bn2;
-                        return solution(temp, 0);
+                case SUBTRACT: cout << " - "; bn2.printNumber();
+					temp = bn1 - bn2;
+                    return solution(temp, 0);
                         
-                case MULTIPLY: cout << "Entered: "; bn1.printNumber(); cout << " * "; bn2.printNumber();
-								temp = bn1 * bn2;
-                        return solution(temp, 0);      
+                case MULTIPLY: cout << " * "; bn2.printNumber();
+					temp = bn1 * bn2;
+                    return solution(temp, 0);      
                         
-                case DIVIDE: cout << "Entered: "; bn1.printNumber(); cout << " / "; bn2.printNumber();
-                        if (bn2==0)
-                        {
-                            return solution(temp,1);
-                        }
-                        temp = bn1 / bn2;
-                        return solution(temp, 0);        
+                case DIVIDE: cout << " / "; bn2.printNumber();
+                    if (bn2==0)
+                    {
+                        return solution(temp,1);
+                    }
+                    temp = bn1 / bn2;
+                    return solution(temp, 0);        
                         
                 case FACTORIAL: return solution(temp, 1);    
                    
-                case EXPONENT: cout << "Entered: "; bn1.printNumber(); cout << "^"; bn2.printNumber();
-								temp = bigNumber::exponent(bn1, bn2);
-                        return solution(temp, 0);
+                case EXPONENT: cout << "^"; bn2.printNumber();
+					temp = bigNumber::exponent(bn1, bn2);
+                    return solution(temp, 0);
                 
-                case ITERATION: cout << "Entered: "; bn1.printNumber(); cout << "c"; bn2.printNumber();
-								temp = bigNumber::iterations(bn1, bn2);
-                        return solution(temp, 0);
+                case ITERATION: cout << "c"; bn2.printNumber();
+					temp = bigNumber::iterations(bn1, bn2);
+                    return solution(temp, 0);
                 
                 default: return solution(temp, 1);
             }
@@ -432,28 +421,119 @@ solution solve(string &c, bigNumber previous)
     }
 }
 
+void modifySettings(settings &user)
+{
+    cout << endl;
+    int setI=0;
+    string setS;
+    for (;;)
+    {
+        cout << "Enter desired precision: ";
+        cin >> setI;
+        
+        if (setI>PRECISION)
+        {
+            cout << "Invalid entry (precision is too high)" << endl << endl;
+            continue;
+        }
+        
+        else 
+        {
+            user.setRound(setI);
+            break;
+        }
+    }
+    
+    for (;;)
+    {
+        cin.clear();
+        cin.ignore(MAXENTERED, '\n');
+        
+        setS.clear();
+        
+        if (user.getPercent())
+        {
+            cout << "Turn off percentages? ";
+            std::getline(cin, setS);
+            
+            if (setS=="yes" || setS=="y")
+            {
+                user.percentOff();
+                break;
+            }
+            
+            else if (setS=="no" || setS=="n")
+            {
+                break;
+            }
+            
+            else
+            {
+                cout << "Invalid entry" << endl << endl;
+                continue;
+            }
+        }
+        
+        else
+        {
+            cout << "Turn on percentages? ";
+            std::getline(cin, setS);
+            
+            if (setS=="yes" || setS=="y")
+            {
+                user.percentOn();
+                break;
+            }
+            
+            else if (setS=="no" || setS=="n")
+            {
+                break;
+            }
+            
+            else
+            {
+                cout << "Invalid entry" << endl << endl;
+                continue;
+            }
+        }
+    }
+    
+    cout << endl << endl;
+}
+
 int main(int argc, char** argv)
 {
+    settings user(10, false);
 	bool commline=false;
 
 	if (argc>1)
 		commline=true;
 
-	 string entered;
+	string entered;
     PTYPE problemType = ERROR;
     bool exit = false;
     bigNumber previous;
     
     while (exit == false)
-    {      		
-		if (commline==false)
+    {      	
+    	if (commline==false)
 		{
 			entered.clear();
 
-			previous.printNumber();
+            if (user.getPercent())
+			    previous.printPercent(user.getRound());
+			    
+		    else previous.printNumber(user.getRound());
 			cout << "\n";
 
 			std::getline(cin, entered);
+			
+			if (entered == "settings" || entered == "options" || entered == "preferences")
+            {
+                modifySettings(user);
+                continue;
+            }
+            
 			cout << "-----------------------" << endl;
 		}
 
@@ -470,7 +550,7 @@ int main(int argc, char** argv)
         
         if (entered != "exit" && entered != "EXIT" && entered != "Exit")
         {
-            solution answer(solve(entered, previous));
+            solution answer(solve(entered, previous, user));
         
             if (answer.getError()>0)
             {
