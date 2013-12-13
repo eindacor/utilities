@@ -17,7 +17,7 @@ using std::string;
 #endif //2
 
 #ifndef PRECISION //3
-#define PRECISION 10
+#define PRECISION 20
 #endif //3
 
 #ifdef NOCOMMAS //4

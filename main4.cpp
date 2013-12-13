@@ -48,19 +48,19 @@ PTYPE checkSymbol(char &c)
     return ERROR;
 }
 
-int checkNumber(char &c)
+int checkNumber(char const &c)
 {
     int i = c - '0';
     
     return i;
 }
 
-bool checkSpace(char &c)
+bool checkSpace(char const &c)
 {
     return (c == ' ');
 }
 
-bool isNumber(char &c)
+bool isNumber(char const &c)
 {
 	return (checkNumber(c) >= 0 && checkNumber(c) <= 9);
 }
@@ -93,14 +93,11 @@ solution solve(string &c, bigNumber previous)
     
     for (int i=0; i<c.size(); i++)
     {
-			/*
-			if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false)
+			if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false && c[i] != '@')
 			{
-				cout << "c[i]: " << c[i];
 				return solution(temp, 1);
 			}
-			*/
-
+			
         //if it's a space, and is preceeded by a number, number is complete
         if (checkSpace(c[i])==true && checkNumber(c[i-1]) >= 0 && checkNumber(c[i-1]) <= 9)
         {
@@ -435,23 +432,41 @@ solution solve(string &c, bigNumber previous)
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	bool commline=false;
+
+	if (argc>1)
+		commline=true;
+
 	 string entered;
     PTYPE problemType = ERROR;
     bool exit = false;
     bigNumber previous;
     
     while (exit == false)
-    {      
-        entered.clear();
+    {      		
+		if (commline==false)
+		{
+			entered.clear();
 
-        previous.printNumber();
-        cout << "\n";
-        
-        std::getline(cin, entered);
+			previous.printNumber();
+			cout << "\n";
 
+			std::getline(cin, entered);
 			cout << "-----------------------" << endl;
+		}
+
+		else 
+		{
+			entered.clear();
+			for (int i=1; i<argc; i++)
+			{
+				entered += argv[i];
+			}
+			commline=false;
+		}
+
         
         if (entered != "exit" && entered != "EXIT" && entered != "Exit")
         {

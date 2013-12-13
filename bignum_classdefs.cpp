@@ -409,7 +409,7 @@ bigNumber bigNumber::exponent(bigNumber bn1, bigNumber bn2)
     
     if (bn2.getNegative())
     {
-        temp = bigNumber(1) / temp;
+        temp = (bigNumber(1) / temp);
     }
     
     return temp;
