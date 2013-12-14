@@ -14,7 +14,7 @@ using std::vector;
 using std::string;
 
 #ifndef MAXDIGITS //2
-#define MAXDIGITS 1000
+#define MAXDIGITS 3000
 #endif //2
 
 #ifndef PRECISION //3

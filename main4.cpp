@@ -252,12 +252,6 @@ solution solve(string &c, bigNumber previous, settings &user)
                 return solution(temp, 0);
             }
             
-            /* RELOCATING TO ALLOW ROUNDING OF PREVIOUS NUMBER
-            //if first number is empty, set first number to previous
-            if (first.size()==0)
-                bn1 = previous;
-            */
-                
             //otherwise take ints from vector and use to set bigNumber1
             else 
             {
@@ -431,26 +425,26 @@ void modifySettings(settings &user)
     
     do
     {
+			intSet=0;
         invalid=false;
         setI.clear();
-        //cin.ignore(MAXENTERED, '\n');
         
         cout << "Enter desired precision: ";
         std::getline(cin, setI);
         
         for (int i=0; i<setI.size(); i++)
         {
-            if (isNumber(setI[i]) == false)
+				int target = setI.size()-i-1;
+			
+            if (isNumber(setI[target]) == false)
             {
                 cout << "Invalid entry" << endl << endl;
                 invalid=true;
                 break;
             }
             
-            else intSet += (checkNumber(setI[i]) * (10^i));
+            else intSet += (checkNumber(setI[target]) * pow(10, i));
         }
-        
-        cout << "intSet: " << intSet << endl;
         
         if (invalid==false)
         {
@@ -470,10 +464,7 @@ void modifySettings(settings &user)
     for (;;)
     {
         setS.clear();
-        //cin.ignore(MAXENTERED, '\n');
-        
-        setS.clear();
-        
+      
         if (user.getPercent())
         {
             cout << "Turn off percentages? ";
