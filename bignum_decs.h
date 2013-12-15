@@ -103,20 +103,24 @@ class solution
 class settings
 {
     public:
-        settings() {round = 10; percent = false;}
-        settings(int n, bool b) {round = n; percent = b;}
+        settings() {round = 10; percent = false; showDigits = false;}
+        settings(int n, bool b, bool d) {round = n; percent = b; showDigits = d;}
         ~settings(){};
         
         void setRound(int n);
         void percentOff() {percent=false;}
         void percentOn() {percent=true;}
+		void showDigitsOff() {showDigits=false;}
+		void showDigitsOn() {showDigits=true;}
         
         int getRound() {return round;}
         bool getPercent() {return percent;}
+		bool getShowDigits() {return showDigits;}
     
     private:
         int round;
         bool percent;
+		bool showDigits;
 };
 
 #endif
