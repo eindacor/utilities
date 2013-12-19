@@ -58,17 +58,24 @@ PTYPE checkSymbol(char &c)
     return ERROR;
 }
 
-int checkNumber(char const &c, settings &user)
-{
-    
+int checkNumber(char const &c)
+{   
+SHOWLINE;
+DECLARE(c);
     int i = c - '0';
     
     if (i>=0 && i<=9)
+	{
+SHOWLINE;
+DECLARE(i);
         return i;
+	}
         
     else
     {
-        i = user.getBase() - (c - 'A');
+        i = 10 + (c - 'A');
+SHOWLINE;
+DECLARE(i);
         return i;
     }
 }
@@ -80,7 +87,7 @@ bool checkSpace(char const &c)
 
 bool isNumber(char const &c, settings &user)
 {
-	return (checkNumber(c, user) >= 0 && checkNumber(c, user) <= (user.getBase()-1) );
+	return (checkNumber(c) >= 0 && checkNumber(c) <= (user.getBase()-1) );
 }
 
 bool isSymbol(char &c)
@@ -146,7 +153,7 @@ bigNumber numberFromVector(vector<int> &vec, bool neg, int dec, settings &user)
 
 solution solve(string &c, bigNumber previous, settings &user)
 {
-    c += '@';
+    c += '$';
     PTYPE pType=ERROR;
     
     vector<int> first;
@@ -158,11 +165,6 @@ solution solve(string &c, bigNumber previous, settings &user)
     bn1.setBase(user.getBase());
     bn2.setBase(user.getBase());
     temp.setBase(user.getBase());
-    
-SHOWLINE;
-DECLARE(bn1.getBase());
-DECLARE(bn2.getBase());
-DECLARE(temp.getBase());  
 
     int decimalCount1=0;
     int decimalCount2=0;
@@ -183,7 +185,7 @@ DECLARE(temp.getBase());
     for (int i=0; i<c.size(); i++)
     {
 		//if it isn't a space, number, symbol, end marker, or decimal point, return error
-		if (checkSpace(c[i])==false && isNumber(c[i], user)==false && isSymbol(c[i])==false && c[i] != '@' && c[i] != '.')
+		if (checkSpace(c[i])==false && isNumber(c[i], user)==false && isSymbol(c[i])==false && c[i] != '$' && c[i] != '.')
 		{
 			RETURN_ERROR;
 		}
@@ -216,7 +218,7 @@ DECLARE(temp.getBase());
             //otherwise add number to target vector, add decimal count if needed
             else 
             {
-                (*targetVec).push_back(checkNumber(c[i], user));
+                (*targetVec).push_back(checkNumber(c[i]));
                 numbers++;
                 
                 if (decimal==true)
@@ -318,7 +320,7 @@ DECLARE(temp.getBase());
         }
         
         //if it's an endline character
-        else if (c[i] == '@')
+        else if (c[i] == '$')
         {
 			//if both numbers are empty
 			if (first.size()==0 && second.size()==0)
@@ -383,11 +385,7 @@ DECLARE(temp.getBase());
 
 			cout << "Entered: ";
 			displayNumber(bn1, user, printExact, printStats);
-            
-SHOWLINE;
-DECLARE(bn1.getBase());
-DECLARE(bn2.getBase());
-DECLARE(temp.getBase());
+
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
             {
@@ -411,10 +409,6 @@ DECLARE(temp.getBase());
                         RETURN_ERROR;
                     }
                     temp = bn1 / bn2;
-SHOWLINE;
-DECLARE(bn1.getBase());
-DECLARE(bn2.getBase());
-DECLARE(temp.getBase());
 					RETURN_OK(temp);
                         
                 case FACTORIAL: 
@@ -472,14 +466,14 @@ void modifySettings(settings &user)
         {
 			int target = setI.size()-i-1;
 			
-            if (checkNumber(setI[target], user) < 0 || checkNumber(setI[target], user) > 9)
+            if (checkNumber(setI[target]) < 0 || checkNumber(setI[target]) > 9)
             {
                 cout << "Invalid entry" << endl << endl;
                 invalid=true;
                 break;
             }
             
-            else intSet += (checkNumber(setI[target], user) * pow(10, i));
+            else intSet += (checkNumber(setI[target]) * pow(10, i));
         }
         
         if (invalid==false)
@@ -510,14 +504,14 @@ void modifySettings(settings &user)
         {
 			int target = setI.size()-i-1;
 			
-            if (checkNumber(setI[target], user) < 0 || checkNumber(setI[target], user) > 9 )
+            if (checkNumber(setI[target]) < 0 || checkNumber(setI[target]) > 9 )
             {
                 cout << "Invalid entry" << endl << endl;
                 invalid=true;
                 break;
             }
             
-            else intSet += (checkNumber(setI[target], user) * pow(10, i));
+            else intSet += (checkNumber(setI[target]) * pow(10, i));
         }
     
         

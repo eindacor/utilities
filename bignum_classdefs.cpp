@@ -366,13 +366,7 @@ bigNumber bigNumber::subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 bigNumber bigNumber::subtractNumbers(bigNumber bn1, bigNumber bn2)
 {
     int base = bn1.getBase();
-    
-    /*
-    if (bn2.getBase()!=base && bn2.absolute() != 1)
-        bn2.convertBase(base);
-    */
-    
-	bigNumber difference;
+    bigNumber difference;
 	difference.setBase(base);
 
     if (bn1.absolute() == bn2.absolute())
@@ -696,16 +690,22 @@ void bigNumber::convertBase(int n)
         bigNumber counter;
         counter = temp1.absolute();
         
-        while (counter != 0)
+        while (counter >= 0)
         {
+SHOWLINE;
+SHOWNUMBER(converted1);
+SHOWNUMBER(counter);
             converted1++;
             counter--;
         }
        
         counter = temp2.absolute();
 
-        while (counter != 0)
+        while (counter >= 0)
         {
+SHOWLINE;
+SHOWNUMBER(converted2);
+SHOWNUMBER(counter);
             converted2++;
             counter--;
         }
@@ -714,8 +714,6 @@ void bigNumber::convertBase(int n)
     }
     
     else base = n;
-    
-SHOWLINE;
 }
 
 void bigNumber::printStats()
