@@ -58,11 +58,19 @@ PTYPE checkSymbol(char &c)
     return ERROR;
 }
 
-int checkNumber(char const &c)
+int checkNumber(char const &c, settings &user)
 {
+    
     int i = c - '0';
     
-    return i;
+    if (i>=0 && i<=9)
+        return i;
+        
+    else
+    {
+        i = user.getBase() - (c - 'A');
+        return i;
+    }
 }
 
 bool checkSpace(char const &c)
@@ -70,9 +78,9 @@ bool checkSpace(char const &c)
     return (c == ' ');
 }
 
-bool isNumber(char const &c)
+bool isNumber(char const &c, settings &user)
 {
-	return (checkNumber(c) >= 0 && checkNumber(c) <= 9);
+	return (checkNumber(c, user) >= 0 && checkNumber(c, user) <= (user.getBase()-1) );
 }
 
 bool isSymbol(char &c)
@@ -82,17 +90,23 @@ bool isSymbol(char &c)
 
 void displayNumber(bigNumber &bn, settings &user, bool exact, bool stats)
 {
+
 	if (exact)
 		bn.printNumber();
 
 	else
 	{
 		int actualDigits = bn.getDigitCount() - (PRECISION-bn.getDecimalCount());
-
+		
 		if (user.getPercent())
+		{
 			bn.printPercent(user.getRound());
+		}
 					
-		else bn.printNumber(user.getRound());
+		else 
+		{
+		    bn.printNumber(user.getRound());
+		}
 
 		if (user.getShowDigits() && stats==true)
 		{
@@ -104,13 +118,16 @@ void displayNumber(bigNumber &bn, settings &user, bool exact, bool stats)
 			else cout << actualDigits;
 
 			cout << "\nDecimal places: " << bn.getDecimalCount();
+			cout << "\nBase: " << bn.getBase();
 		}
 	}
+SHOWLINE;
 }
 
-bigNumber numberFromVector(vector<int> &vec, bool neg, int dec)
+bigNumber numberFromVector(vector<int> &vec, bool neg, int dec, settings &user)
 {
 	bigNumber temp;
+	temp.setBase(user.getBase());
 
 	for (int i=0; i<vec.size(); i++)
 	{
@@ -138,6 +155,15 @@ solution solve(string &c, bigNumber previous, settings &user)
     bigNumber bn2;
     bigNumber temp;
     
+    bn1.setBase(user.getBase());
+    bn2.setBase(user.getBase());
+    temp.setBase(user.getBase());
+    
+SHOWLINE;
+DECLARE(bn1.getBase());
+DECLARE(bn2.getBase());
+DECLARE(temp.getBase());  
+
     int decimalCount1=0;
     int decimalCount2=0;
     int numbers=0;
@@ -157,7 +183,7 @@ solution solve(string &c, bigNumber previous, settings &user)
     for (int i=0; i<c.size(); i++)
     {
 		//if it isn't a space, number, symbol, end marker, or decimal point, return error
-		if (checkSpace(c[i])==false && isNumber(c[i])==false && isSymbol(c[i])==false && c[i] != '@' && c[i] != '.')
+		if (checkSpace(c[i])==false && isNumber(c[i], user)==false && isSymbol(c[i])==false && c[i] != '@' && c[i] != '.')
 		{
 			RETURN_ERROR;
 		}
@@ -166,7 +192,7 @@ solution solve(string &c, bigNumber previous, settings &user)
 		else if (checkSpace(c[i])==true)
 		{
 			//if it's preceeded by a number, number is complete
-			if (checkNumber(c[i-1]) >= 0 && checkNumber(c[i-1]) <= 9)
+			if (isNumber(c[i-1], user))
 		    {
 		        done = true;
 		    }
@@ -179,7 +205,7 @@ solution solve(string &c, bigNumber previous, settings &user)
 		}
 
         //if it's a number
-        else if (checkNumber(c[i]) >= 0 && checkNumber(c[i]) <= 9)
+        else if (isNumber(c[i], user))
         {        
             //if number was complete, return error
             if (done==true)
@@ -190,7 +216,7 @@ solution solve(string &c, bigNumber previous, settings &user)
             //otherwise add number to target vector, add decimal count if needed
             else 
             {
-                (*targetVec).push_back(checkNumber(c[i]));
+                (*targetVec).push_back(checkNumber(c[i], user));
                 numbers++;
                 
                 if (decimal==true)
@@ -312,8 +338,7 @@ solution solve(string &c, bigNumber previous, settings &user)
 			//otherwise create bn1 from entered and print it as is
             else if (pType != SUBTRACT)
             {   
-				bn1 = numberFromVector(first, negative1, decimalCount1);
-                //cout << "Entered: "; bn1.printNumber(); 
+				bn1 = numberFromVector(first, negative1, decimalCount1, user);
 				printExact=true;
             }
             
@@ -330,7 +355,6 @@ solution solve(string &c, bigNumber previous, settings &user)
 					displayNumber(previous, user, false, false);
 					cout << " - "; 
 					displayNumber(bn1, user, true, false);
-					//bn1.absolute().printNumber();
 
 					RETURN_OK(temp);
 					//return solution(temp, 0);
@@ -354,12 +378,16 @@ solution solve(string &c, bigNumber previous, settings &user)
             //otherwise take ints from second vector and use to set bigNumber2
             else 
             {
-                bn2 = numberFromVector(second, negative2, decimalCount2);
+                bn2 = numberFromVector(second, negative2, decimalCount2, user);
             }
 
 			cout << "Entered: ";
 			displayNumber(bn1, user, printExact, printStats);
             
+SHOWLINE;
+DECLARE(bn1.getBase());
+DECLARE(bn2.getBase());
+DECLARE(temp.getBase());
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
             {
@@ -368,17 +396,14 @@ solution solve(string &c, bigNumber previous, settings &user)
                 case ADD: cout << " + "; bn2.printNumber();
                     temp = bn1 + bn2;
 					RETURN_OK(temp);
-                    //return solution(temp, 0);
                 
                 case SUBTRACT: cout << " - "; bn2.printNumber();
 					temp = bn1 - bn2;
 					RETURN_OK(temp);
-                    //return solution(temp, 0);
                         
                 case MULTIPLY: cout << " * "; bn2.printNumber();
 					temp = bn1 * bn2;
 					RETURN_OK(temp);
-                    //return solution(temp, 0);      
                         
                 case DIVIDE: cout << " / "; bn2.printNumber();
                     if (bn2==0)
@@ -386,8 +411,11 @@ solution solve(string &c, bigNumber previous, settings &user)
                         RETURN_ERROR;
                     }
                     temp = bn1 / bn2;
+SHOWLINE;
+DECLARE(bn1.getBase());
+DECLARE(bn2.getBase());
+DECLARE(temp.getBase());
 					RETURN_OK(temp);
-                    //return solution(temp, 0);        
                         
                 case FACTORIAL: 
 					if (bn1<0 || bn1.getDecimalCount() > 0)
@@ -398,8 +426,9 @@ solution solve(string &c, bigNumber previous, settings &user)
                     else if (bn1==0)
                     {
 						cout << "!";
-						RETURN_OK(bigNumber(1));
-                        //return solution(bigNumber(1), 0);
+						bigNumber fact(1);
+						fact.setBase(user.getBase());
+						RETURN_OK(fact);
                     }
                     
                     temp = bigNumber::factorial(bn1);
@@ -441,23 +470,23 @@ void modifySettings(settings &user)
         
         for (int i=0; i<setI.size(); i++)
         {
-				int target = setI.size()-i-1;
+			int target = setI.size()-i-1;
 			
-            if (isNumber(setI[target]) == false)
+            if (checkNumber(setI[target], user) < 0 || checkNumber(setI[target], user) > 9)
             {
                 cout << "Invalid entry" << endl << endl;
                 invalid=true;
                 break;
             }
             
-            else intSet += (checkNumber(setI[target]) * pow(10, i));
+            else intSet += (checkNumber(setI[target], user) * pow(10, i));
         }
         
         if (invalid==false)
         {
             if (intSet>PRECISION)
             {
-                cout << "Invalid entry (precision is too high)" << endl << endl;
+                cout << "Invalid entry (precision must be between 0 and " << PRECISION << ")" << endl << endl;
                 invalid=true;
             }
             
@@ -468,12 +497,52 @@ void modifySettings(settings &user)
         }
     } while (invalid==true);
     
+    do
+    {
+		intSet=0;
+        invalid=false;
+        setI.clear();
+        
+        cout << "Enter desired base: ";
+        std::getline(cin, setI);
+        
+        for (int i=0; i<setI.size(); i++)
+        {
+			int target = setI.size()-i-1;
+			
+            if (checkNumber(setI[target], user) < 0 || checkNumber(setI[target], user) > 9 )
+            {
+                cout << "Invalid entry" << endl << endl;
+                invalid=true;
+                break;
+            }
+            
+            else intSet += (checkNumber(setI[target], user) * pow(10, i));
+        }
+    
+        
+        if (invalid==false)
+        {
+            if (intSet < 2 || intSet > 36)
+            {
+                cout << "Invalid entry (base must be between 2 and 36)" << endl << endl;
+                invalid=true;
+            }
+            
+            else 
+            {
+                user.setBase(intSet);
+            }
+        }
+        
+    } while (invalid==true);
+    
     for (;;)
     {
-        setS.clear();
       
         if (user.getPercent())
         {
+            setS.clear();
             cout << "Turn off percentages? ";
             std::getline(cin, setS);
             
@@ -497,6 +566,7 @@ void modifySettings(settings &user)
         
         else
         {
+            setS.clear();
             cout << "Turn on percentages? ";
             std::getline(cin, setS);
             
@@ -585,12 +655,18 @@ int main(int argc, char** argv)
     PTYPE problemType = ERROR;
     bool exit = false;
     bigNumber previous;
+    previous.updateDigits();
     
     while (exit == false)
-    {      	
+    {     
     	if (commline==false)
 		{
 			entered.clear();
+SHOWLINE;
+DECLARE(previous.getBase());
+DECLARE(user.getBase());
+            if (previous.getBase() != user.getBase())
+                previous.convertBase(user.getBase());
 
 			cout << "\n";
             displayNumber(previous, user, false, true);
@@ -616,12 +692,11 @@ int main(int argc, char** argv)
 			}
 			commline=false;
 		}
-
         
         if (entered != "exit" && entered != "EXIT" && entered != "Exit")
         {
             solution answer(solve(entered, previous, user));
-        
+      
             if (answer.getError()>0)
             {
                 cout << endl << "Invalid Input (Error " << answer.getError() << ")";

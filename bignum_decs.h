@@ -17,6 +17,9 @@ class bigNumber
 		int getDecimalCount();
 		int printNumber();
 		int printNumber(int n);
+		void printDigit(int n);
+		int getBase() {return base;}
+		
 		void printPercent();
 		void printPercent(int n);
 		void printStats();
@@ -24,12 +27,15 @@ class bigNumber
 		void updateDigits();
 		void adjustPrecision(int n);
 		void query (int n);
+		void printBase(int n);
+		void convertBase(int n);
 
 		void timesTen (int n);
 		void divideByTen (int n);
 		
 		void setNegative() {negative = true;}
 		void setPositive() {negative = false;}
+		void setBase(int n) {base = n;}
 		
 		bool operator < (bigNumber b); 
 		bool operator <= (bigNumber b); 
@@ -65,8 +71,8 @@ class bigNumber
 		bigNumber absolute();
 		bigNumber noDecimal();
 		
-		static bigNumber addNumbers(bigNumber &bn1, bigNumber &bn2);
-        static bigNumber subtractNumbers(bigNumber &bn1, bigNumber &bn2);
+		static bigNumber addNumbers(bigNumber bn1, bigNumber bn2);
+        static bigNumber subtractNumbers(bigNumber bn1, bigNumber bn2);
         static bigNumber multiplyNumbersSimple(bigNumber bn1, int n);
         static bigNumber multiplyNumbers(bigNumber &bn1, bigNumber &bn2);
         static int divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r);
@@ -84,6 +90,7 @@ class bigNumber
 		int digitCount;
 		int decimalCount;
 		bool negative;
+		int base;
 };
 
 class solution
@@ -103,11 +110,12 @@ class solution
 class settings
 {
     public:
-        settings() {round = 10; percent = false; showDigits = false;}
-        settings(int n, bool b, bool d) {round = n; percent = b; showDigits = d;}
+        settings() {round = 10; percent = false; showDigits = false; base = 10;}
+        settings(int n, bool b, bool d) {round = n; percent = b; showDigits = d; base = 10;}
         ~settings(){};
         
         void setRound(int n);
+        void setBase(int n) {base=n;}
         void percentOff() {percent=false;}
         void percentOn() {percent=true;}
 		void showDigitsOff() {showDigits=false;}
@@ -116,11 +124,13 @@ class settings
         int getRound() {return round;}
         bool getPercent() {return percent;}
 		bool getShowDigits() {return showDigits;}
+		int getBase() {return base;}
     
     private:
         int round;
         bool percent;
 		bool showDigits;
+		int base;
 };
 
 #endif

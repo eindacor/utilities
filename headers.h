@@ -28,10 +28,10 @@ using std::string;
 #endif //4
 
 #ifdef DEBUG //5
-#define SHOWNUMBER(x) cout << endl; x.printNumber(); cout << endl
+#define SHOWNUMBER(x) cout << endl << #x << "= " ; x.printNumber(); cout << endl
 #define DECLARE(x) cout << "\n\t|  DECLARATION: " << #x << "= " << x
 #define SHOW(x) x
-#define SHOWLINE cout << endl << endl << __LINE__ << endl
+#define SHOWLINE cout << endl << endl << __FILE__ << ": " << __LINE__ << endl
 #else
 #define SHOWNUMBER(x)
 #define DECLARE(x)

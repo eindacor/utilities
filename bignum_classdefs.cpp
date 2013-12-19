@@ -1,6 +1,7 @@
 #include "headers.h"
 #include "bignum_decs.h"
 
+/* ORIGINAL ADDNUMBERS FUNCTION
 bigNumber bigNumber::addNumbers(bigNumber &bn1, bigNumber &bn2)
 {
 	bigNumber sum;
@@ -114,7 +115,132 @@ bigNumber bigNumber::addNumbers(bigNumber &bn1, bigNumber &bn2)
 	sum.updateDigits();
 	return sum;
 }
+*/
 
+//FUNCTION FOR ADDING NUMBERS OF DIFFERENT BASES
+bigNumber bigNumber::addNumbers(bigNumber bn1, bigNumber bn2)
+{
+    int base = bn1.getBase();
+    
+    /*
+    if (base != temp.getBase())
+        temp.convertBase(base);
+    */
+    
+	bigNumber sum;
+
+    if (bn1.absolute() == bn2.absolute())
+    {
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp(0);
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            bigNumber temp(0);
+            return temp;
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+    }
+    
+    if (bn1.absolute() > bn2.absolute())
+    {
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+				temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+				temp.updateDigits();
+            return temp;
+        }
+    }
+    
+    if (bn1.absolute() < bn2.absolute())
+    {
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+				temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+				temp.updateDigits();
+            return temp;
+        }
+    }
+    
+	vector<int> temp;
+	int carry=0;
+	int digits=0;
+	int decimal=0;
+
+	if (bn1.getDecimalCount() > bn2.getDecimalCount())
+		decimal = bn1.getDecimalCount();
+
+	else decimal = bn2.getDecimalCount();
+
+	if (bn1.getDigitCount() > bn2.getDigitCount())
+		digits = bn1.getDigitCount()+1;
+
+	else digits = bn2.getDigitCount()+1;
+
+	for (int i=(PRECISION-decimal); i<digits+1; i++)
+	{
+		int tempNumber = bn1.getDigit(i) + bn2.getDigit(i);
+		
+		tempNumber += carry;
+
+		if (tempNumber>(base-1))
+		{
+			tempNumber-=base;
+			carry = 1;
+		}
+
+		else 
+		{
+			carry = 0;
+		}
+
+		sum.setDigit(i, tempNumber);
+	}
+    
+	sum.updateDigits();
+	sum.setBase(base);
+	return sum;
+}
+
+/*ORIGINAL FUNCTION FOR SUBTRACTING NUMBERS
 bigNumber bigNumber::subtractNumbers(bigNumber &bn1, bigNumber &bn2)
 {
 	bigNumber sum;
@@ -234,12 +360,144 @@ bigNumber bigNumber::subtractNumbers(bigNumber &bn1, bigNumber &bn2)
    sum.updateDigits();
 	return sum;
 }
+*/
+
+//FUNCTION FOR SUBTRACTING NUMBERS OF DIFFERENT BASES
+bigNumber bigNumber::subtractNumbers(bigNumber bn1, bigNumber bn2)
+{
+    int base = bn1.getBase();
+    
+    /*
+    if (bn2.getBase()!=base && bn2.absolute() != 1)
+        bn2.convertBase(base);
+    */
+    
+	bigNumber difference;
+	difference.setBase(base);
+
+    if (bn1.absolute() == bn2.absolute())
+    {
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+    }
+    
+    if (bn1.absolute() > bn2.absolute())
+    {
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            bigNumber temp = bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+    }
+    
+    if (bn1.absolute() < bn2.absolute())
+    {
+        if (bn1.getNegative()==false && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::subtractNumbers(bn2.absolute(), bn1.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==false)
+        {
+            bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+            temp.setNegative();
+			temp.updateDigits();
+            return temp;
+        }
+        
+        if (bn1.getNegative()==false && bn2.getNegative()==true)
+        {
+            return bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
+        }
+        
+        if (bn1.getNegative()==true && bn2.getNegative()==true)
+        {
+            return bigNumber::subtractNumbers(bn2.absolute(), bn1.absolute());
+        }
+    }
+	  
+  	vector<int> temp;
+	int carry=0;
+	int digits=0;
+	int decimal=0;
+
+	if (bn1.getDecimalCount() > bn2.getDecimalCount())
+		decimal = bn1.getDecimalCount();
+
+	else decimal = bn2.getDecimalCount();
+
+	if (bn1.getDigitCount() > bn2.getDigitCount())
+		digits = bn1.getDigitCount()+1;
+
+	else digits = bn2.getDigitCount()+1;
+
+	for (int i=(PRECISION-decimal); i<digits+1; i++)
+	{
+		int tempNumber = bn1.getDigit(i) - bn2.getDigit(i);
+		
+		tempNumber -= carry;
+
+		if (tempNumber<0)
+		{
+			tempNumber+=base;
+			carry = 1;
+		}
+
+		else 
+		{
+			carry = 0;
+		}
+
+		difference.setDigit(i, tempNumber);
+	}
+
+    difference.updateDigits();
+    difference.setBase(base);
+	return difference;
+}
 
 bigNumber bigNumber::multiplyNumbersSimple(bigNumber bn1, int n)
 {  
     if (n==0)
     {
-    		bigNumber zero;
+    	bigNumber zero;
+    	zero.setBase(bn1.getBase());
        	return zero;
     }
     
@@ -255,13 +513,14 @@ bigNumber bigNumber::multiplyNumbersSimple(bigNumber bn1, int n)
         temp += bn1;
     }
     
-	 temp.updateDigits();
+    temp.updateDigits();
     return temp;
 }
 
 bigNumber bigNumber::multiplyNumbers(bigNumber &bn1, bigNumber &bn2)
 {
-   bigNumber temp(0);
+    bigNumber temp(0);
+    temp.setBase(bn1.getBase());
 
 	if (bn1==temp || bn2==temp)
 	{
@@ -309,7 +568,9 @@ int bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
 
 bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 {
+    int baseSet=bn1.getBase();
 	bigNumber temp;
+	temp.setBase(baseSet);
 
 	if (bn1.getNegative() != bn2.getNegative())
 	{
@@ -323,8 +584,10 @@ bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 	bool end=false;
 	int counter=bn1.getDigitCount()-1;
 	bigNumber numberToCompare(bn1.getDigit(counter));
+	numberToCompare.setBase(baseSet);
 	int nextNumber = divideNumbersSimple(numberToCompare, bn2.noDecimal(), remainder);
 	bigNumber numberToSubtract;
+	numberToSubtract.setBase(baseSet);
 
 	while (end != true)
 	{
@@ -415,6 +678,46 @@ bigNumber bigNumber::exponent(bigNumber bn1, bigNumber bn2)
     return temp;
 }
 
+void bigNumber::convertBase(int n)
+{
+    if (*this!=0)
+    {
+
+        bigNumber temp1 = (*this);
+        bigNumber temp2(1);
+        temp1.timesTen(decimalCount);
+        temp2.timesTen(decimalCount);
+        
+        bigNumber converted1;
+        bigNumber converted2;
+        converted1.setBase(n);
+        converted2.setBase(n);
+        
+        bigNumber counter;
+        counter = temp1.absolute();
+        
+        while (counter != 0)
+        {
+            converted1++;
+            counter--;
+        }
+       
+        counter = temp2.absolute();
+
+        while (counter != 0)
+        {
+            converted2++;
+            counter--;
+        }
+ 
+        *this = converted1 / converted2;
+    }
+    
+    else base = n;
+    
+SHOWLINE;
+}
+
 void bigNumber::printStats()
 {
 	cout << endl << "digitCount=" << digitCount << " ; decimalCount=" << decimalCount << " ; ";
@@ -427,6 +730,8 @@ void bigNumber::printStats()
 
 void bigNumber::operator = (bigNumber b)
 {
+    base = b.getBase();
+    
 	int highestDigits=0;
 	int decimal=0;
 
@@ -492,29 +797,39 @@ bigNumber::bigNumber(int n)
 	}	
 
 	decimalCount = 0;
+	base = 10;
 	updateDigits();
 }
 
 bool bigNumber::operator == (bigNumber b)
 {
+    bigNumber temp = b;
+    
     if (negative != b.getNegative())
     {
         return false;
     }
     
-    if (digitCount != b.getDigitCount())
+    /*
+    if (base != temp.getBase())
+    {
+        temp.convertBase(base);
+    }
+    */
+    
+    if (digitCount != temp.getDigitCount())
     {
         return false;
     }
-    
-    for (int i=digitCount-1; i>=0; i--)
+
+    for (int i=digitCount; i>0; i--)
     {
-        if (digits[i] != b.getDigit(i))
+        if (digits[i-1] != temp.getDigit(i-1))
         {
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -537,35 +852,42 @@ bool bigNumber::operator == (int n)
 
 bool bigNumber::operator < (bigNumber b)
 {
+    bigNumber temp = b;
+    
+    /*
+    if (base != temp.getBase())
+        temp.convertBase(base);
+    */
+    
     updateDigits();
-    b.updateDigits();
+    temp.updateDigits();
     
-    if (*this == b)
+    if (*this == temp)
     {
         return false;
     }
     
-    if (negative==true && b.getNegative()==false)
+    if (negative==true && temp.getNegative()==false)
     {
         return true;
     }
     
-    if (negative==false && b.getNegative()==true)
+    if (negative==false && temp.getNegative()==true)
     {
         return false;
     }
     
-    if (negative==true && b.getNegative()==true)
+    if (negative==true && temp.getNegative()==true)
     {
-        return ( absolute() > b.absolute() );
+        return ( absolute() > temp.absolute() );
     }
     
-    if (digitCount < b.getDigitCount())
+    if (digitCount < temp.getDigitCount())
     {
         return true;
     }
     
-    if (digitCount > b.getDigitCount())
+    if (digitCount > temp.getDigitCount())
     {
         return false;
     }
@@ -573,12 +895,12 @@ bool bigNumber::operator < (bigNumber b)
     
     for (int i=digitCount-1; i>=0; i--)
     {
-        if (digits[i] < b.getDigit(i))
+        if (digits[i] < temp.getDigit(i))
         {
             return true;
         }
         
-        if (digits[i] > b.getDigit(i))
+        if (digits[i] > temp.getDigit(i))
         {
             return false;
         }
@@ -589,48 +911,54 @@ bool bigNumber::operator < (bigNumber b)
 
 bool bigNumber::operator <= (bigNumber b)
 {
+    bigNumber temp = b;
+    
+    /*
+    if (base != temp.getBase())
+        temp.convertBase(base);
+    */
+    
     updateDigits();
-    b.updateDigits();
+    temp.updateDigits();
     
-    if (*this == b)
+    if (*this == temp)
     {
         return true;
     }
     
-    if (negative==true && b.getNegative()==false)
+    if (negative==true && temp.getNegative()==false)
     {
         return true;
     }
     
-    if (negative==false && b.getNegative()==true)
+    if (negative==false && temp.getNegative()==true)
     {
         return false;
     }
     
-    if (negative==true && b.getNegative()==true)
+    if (negative==true && temp.getNegative()==true)
     {
-        return ( absolute() > b.absolute() );
+        return ( absolute() > temp.absolute() );
     }
     
-    if (digitCount < b.getDigitCount())
+    if (digitCount < temp.getDigitCount())
     {
         return true;
     }
     
-    if (digitCount > b.getDigitCount())
+    if (digitCount > temp.getDigitCount())
     {
         return false;
     }
 
-    
     for (int i=digitCount-1; i>=0; i--)
     {
-        if (digits[i] < b.getDigit(i))
+        if (digits[i] < temp.getDigit(i))
         {
             return true;
         }
         
-        if (digits[i] > b.getDigit(i))
+        if (digits[i] > temp.getDigit(i))
         {
             return false;
         }
@@ -655,47 +983,54 @@ bool bigNumber::operator <= (int n)
 
 bool bigNumber::operator > (bigNumber b)
 {
+    bigNumber temp = b;
+    
+    /*
+    if (base != temp.getBase())
+        temp.convertBase(base);
+    */
+    
     updateDigits();
-    b.updateDigits();
+    temp.updateDigits();
     
-    if (*this == b)
+    if (*this == temp)
     {
         return false;
     }
     
-    if (negative==false && b.getNegative()==true)
+    if (negative==false && temp.getNegative()==true)
     {
         return true;
     }
     
-    if (negative==true && b.getNegative()==false)
+    if (negative==true && temp.getNegative()==false)
     {
         return false;
     }
     
-    if (negative==true && b.getNegative()==true)
+    if (negative==true && temp.getNegative()==true)
     {
-        return ( absolute() < b.absolute() );
+        return ( absolute() < temp.absolute() );
     }
     
-    if (digitCount > b.getDigitCount())
+    if (digitCount > temp.getDigitCount())
     {
         return true;
     }
     
-    if (digitCount < b.getDigitCount())
+    if (digitCount < temp.getDigitCount())
     {
         return false;
     }
     
     for (int i=digitCount-1; i>=0; i--)
     {
-        if (digits[i] > b.getDigit(i))
+        if (digits[i] > temp.getDigit(i))
         {
             return true;
         }
         
-        if (digits[i] < b.getDigit(i))
+        if (digits[i] < temp.getDigit(i))
         {
             return false;
         }
@@ -706,47 +1041,54 @@ bool bigNumber::operator > (bigNumber b)
 
 bool bigNumber::operator >= (bigNumber b)
 {
+    bigNumber temp = b;
+    
+    /*
+    if (base != temp.getBase())
+        temp.convertBase(base);
+    */
+    
     updateDigits();
-    b.updateDigits();
+    temp.updateDigits();
     
-    if (*this == b)
+    if (*this == temp)
     {
         return true;
     }
     
-    if (negative==false && b.getNegative()==true)
+    if (negative==false && temp.getNegative()==true)
     {
         return true;
     }
     
-    if (negative==true && b.getNegative()==false)
+    if (negative==true && temp.getNegative()==false)
     {
         return false;
     }
     
-    if (negative==true && b.getNegative()==true)
+    if (negative==true && temp.getNegative()==true)
     {
-        return ( absolute() < b.absolute() );
+        return ( absolute() < temp.absolute() );
     }
     
-    if (digitCount > b.getDigitCount())
+    if (digitCount > temp.getDigitCount())
     {
         return true;
     }
     
-    if (digitCount < b.getDigitCount())
+    if (digitCount < temp.getDigitCount())
     {
         return false;
     }
     
     for (int i=digitCount-1; i>=0; i--)
     {
-        if (digits[i] > b.getDigit(i))
+        if (digits[i] > temp.getDigit(i))
         {
             return true;
         }
         
-        if (digits[i] < b.getDigit(i))
+        if (digits[i] < temp.getDigit(i))
         {
             return false;
         }
@@ -757,16 +1099,16 @@ bool bigNumber::operator >= (bigNumber b)
 
 bool bigNumber::operator > (int n)
 {
-	bigNumber b(n);
-   updateDigits(); 
-   return (*this > b);
+    bigNumber b(n);
+    updateDigits(); 
+    return (*this > b);
 }
 
 bool bigNumber::operator >= (int n)
 {
-	bigNumber b(n);
-   updateDigits(); 
-   return (*this >= b);
+    bigNumber b(n);
+    updateDigits(); 
+    return (*this >= b);
 }
 
 void bigNumber::updateDigits()
@@ -774,34 +1116,34 @@ void bigNumber::updateDigits()
 	digitCount=0;
 	decimalCount=0;
 
-	for (int i=MAXDIGITS-1; i>0; i--)
-   {
-		if (i==PRECISION)
-		{
-			digitCount = PRECISION + 1;
-			break;
-		}
-
-   	if (digits[i]>0)
-      {
-      	digitCount = (i+1);
-			break;
-      }	
-	}
-
-	for (int i=0; i<PRECISION; i++)
-	{
-		if (digits[i]>0)
-		{
-			decimalCount = PRECISION-i;
-			break;
-		}
-	}
-
-	if (decimalCount==0 && digitCount==(PRECISION+1) && digits[PRECISION]==0)
-	{
-		setPositive();
-	}
+    for (int i=MAXDIGITS-1; i>0; i--)
+    {
+    	if (i==PRECISION)
+    	{
+    		digitCount = PRECISION + 1;
+    		break;
+    	}
+    
+       	if (digits[i]>0)
+        {
+          digitCount = (i+1);
+        	break;
+        }	
+    }
+    
+    for (int i=0; i<PRECISION; i++)
+    {
+    	if (digits[i]>0)
+    	{
+    		decimalCount = PRECISION-i;
+    		break;
+    	}
+    }
+    
+    if (decimalCount==0 && digitCount==(PRECISION+1) && digits[PRECISION]==0)
+    {
+    	setPositive();
+    }
 }
 
 bigNumber::bigNumber()
@@ -812,6 +1154,7 @@ bigNumber::bigNumber()
     }
     
 	decimalCount=0;
+	base = 10;
 	updateDigits();
 }
 
@@ -830,6 +1173,7 @@ bigNumber::bigNumber(vector<int> n)
 	}
 
 	updateDigits();
+	base = 10;
 	negative = false;
 }
 
@@ -845,16 +1189,30 @@ int bigNumber::getDecimalCount()
 	return decimalCount;
 }
 
+void bigNumber::printDigit(int n)
+{
+    if (n<10)
+        cout << n;
+        
+    else 
+    {
+        char toPrint='A';
+        toPrint += (n-10);
+        cout << toPrint;
+    }
+}
+
 int bigNumber::printNumber()
 {
 	bigNumber temp;
-	if (*this==temp)
+	temp.updateDigits();
+	if ((*this)==temp)
 	{
 		cout << 0;
 		return 0;
 	}
 
-   updateDigits();
+    updateDigits();
 
 	int comma = (digitCount-PRECISION) % 3;
 
@@ -882,7 +1240,8 @@ int bigNumber::printNumber()
 			comma = 3;
 		}
 
-		cout << digits[target];
+        printDigit(digits[target]);
+		//cout << digits[target];
 
 		comma--;
 	}
@@ -899,7 +1258,9 @@ int bigNumber::printNumber(int n)
     }
     
 	bigNumber temp;
-	if (*this==temp)
+	temp.updateDigits();
+
+	if ((*this)==temp)
 	{
 		cout << 0;
 		return 0;
@@ -940,12 +1301,14 @@ int bigNumber::printNumber(int n)
 
         if (i == toPrint-1 && target > 0 && digits[target-1] > 4)
         {
-            cout << (digits[target]+1);
+            printDigit(digits[target]+1);
+            //cout << (digits[target]+1);
         }
             
         else
         {
-		    cout << digits[target];
+            printDigit(digits[target]);
+		    //cout << digits[target];
         }
 
 		comma--;
