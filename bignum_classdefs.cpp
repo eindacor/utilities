@@ -180,9 +180,8 @@ bigNumber bigNumber::addNumbers(bigNumber bn1, bigNumber bn2)
     {
         if (bn1.getNegative()==true && bn2.getNegative()==false)
         {
-            bigNumber temp = bigNumber::subtractNumbers(bn1.absolute(), bn2.absolute());
-            temp.setNegative();
-				temp.updateDigits();
+            bigNumber temp = bigNumber::subtractNumbers(bn2.absolute(), bn1.absolute());
+			temp.updateDigits();
             return temp;
         }
         
@@ -195,7 +194,7 @@ bigNumber bigNumber::addNumbers(bigNumber bn1, bigNumber bn2)
         {
             bigNumber temp = bigNumber::addNumbers(bn1.absolute(), bn2.absolute());
             temp.setNegative();
-				temp.updateDigits();
+			temp.updateDigits();
             return temp;
         }
     }
@@ -692,9 +691,6 @@ void bigNumber::convertBase(int n)
         
         while (counter >= 0)
         {
-SHOWLINE;
-SHOWNUMBER(converted1);
-SHOWNUMBER(counter);
             converted1++;
             counter--;
         }
@@ -703,9 +699,6 @@ SHOWNUMBER(counter);
 
         while (counter >= 0)
         {
-SHOWLINE;
-SHOWNUMBER(converted2);
-SHOWNUMBER(counter);
             converted2++;
             counter--;
         }
