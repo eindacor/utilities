@@ -91,7 +91,6 @@ bool isSymbol(char &c)
 
 void displayNumber(bigNumber &bn, settings &user, bool exact, bool stats)
 {
-
 	if (exact)
 		bn.printNumber();
 
@@ -688,6 +687,12 @@ int main(int argc, char** argv)
                 modifySettings(user);
                 continue;
             }
+
+			if (entered == "STATS" || entered == "stats" || entered == "Stats")
+			{
+				displayNumber(previous, user, false, true);
+				continue;
+			}
 		}
 
 		else 
