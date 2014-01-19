@@ -29,6 +29,7 @@ class bigNumber
 		void query (int n);
 		void printBase(int n);
 		void convertBase(int n);
+		void convertBaseSimple(int n);
 
 		void timesTen (int n);
 		void divideByTen (int n);
