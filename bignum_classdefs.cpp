@@ -300,6 +300,8 @@ bigNumber bigNumber::multiplyNumbers(bigNumber &bn1, bigNumber &bn2)
 
 int bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
 {
+    SHOWNUMBER(bn1);
+    SHOWNUMBER(bn2);
 	int temp=0;
 	
 	while (bn1 >= bn2)
@@ -313,11 +315,15 @@ int bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
 		r = true;
 	}
 
+    SHOW(temp);
 	return temp;
 }
 
 bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 {
+    SHOWNUMBER(bn1);
+    SHOWNUMBER(bn2);
+    
     int baseSet=bn1.getBase();
 	bigNumber temp;
 	temp.setBase(baseSet);
@@ -371,6 +377,7 @@ bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 	}
 
 	temp.timesTen(bn2.getDecimalCount());
+	SHOWNUMBER(temp);
 	return temp;
 }
 

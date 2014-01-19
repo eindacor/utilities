@@ -28,9 +28,9 @@ using std::string;
 #endif //4
 
 #ifdef DEBUG //5
-#define SHOWNUMBER(x) cout << endl << "line " << __LINE__ << ":\t" << #x << "= " ; x.printNumber(); cout << endl
-#define DECLARE(x) cout << endl << "line " << __LINE__ << ":\t" << "DECLARATION: " << #x << "= " << x
-#define SHOW(x) cout << endl << "line " << __LINE__ << ":\t" ; x
+#define SHOWNUMBER(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" << #x << "= " ; x.printNumber(); cout << endl
+#define DECLARE(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" << #x << "= " << x
+#define SHOW(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" ; x
 #define SHOWLINE cout << endl << endl << __FILE__ << ": " << __LINE__ << endl
 #else
 #define SHOWNUMBER(x)

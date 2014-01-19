@@ -314,16 +314,12 @@ solution solve(string &c, bigNumber previous, settings &user)
         //if it's an endline character
         else if (c[i] == '$')
         {
-			SHOWNUMBER(bn1);
-			SHOWNUMBER(bn2);
-
 			//if both numbers are empty
 			if (first.size()==0 && second.size()==0)
 			{
 				if (pType==FACTORIAL)
 				{
 					bn1 = previous;
-					SHOWNUMBER(bn1);
 				}
 
 				else RETURN_ERROR;
@@ -333,14 +329,12 @@ solution solve(string &c, bigNumber previous, settings &user)
 			if (first.size()==0)
 				{
 					bn1 = previous;
-					SHOWNUMBER(bn1);
 				}
 
 			//otherwise create bn1 from entered and print it as is
             else
             {   
 				bn1 = numberFromVector(first, negative1, decimalCount1, user);
-				SHOWNUMBER(bn1);
 				printExact=true;
             }
             
@@ -351,10 +345,7 @@ solution solve(string &c, bigNumber previous, settings &user)
                 if (negative1==true && pType == ERROR)
                 {
 					bn1.setPositive();
-					SHOWNUMBER(previous);
-					SHOWNUMBER(bn1);
                     temp = previous - bn1;
-					SHOWNUMBER(temp);
 
 					cout << "Entered: "; 
 					displayNumber(previous, user, false, false);
@@ -384,14 +375,10 @@ solution solve(string &c, bigNumber previous, settings &user)
             else 
             {
                 bn2 = numberFromVector(second, negative2, decimalCount2, user);
-				SHOWNUMBER(bn2);
             }
 
 			cout << "Entered: ";
 			displayNumber(bn1, user, printExact, printStats);
-
-			SHOWNUMBER(bn1);
-			SHOWNUMBER(bn2);
 
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
@@ -400,17 +387,14 @@ solution solve(string &c, bigNumber previous, settings &user)
                 
                 case ADD: cout << " + "; bn2.printNumber();
                     temp = bn1 + bn2;
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                 
                 case SUBTRACT: cout << " - "; bn2.printNumber();
 					temp = bn1 - bn2;
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                         
                 case MULTIPLY: cout << " * "; bn2.printNumber();
 					temp = bn1 * bn2;
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                         
                 case DIVIDE: cout << " / "; bn2.printNumber();
@@ -419,7 +403,6 @@ solution solve(string &c, bigNumber previous, settings &user)
                         RETURN_ERROR;
                     }
                     temp = bn1 / bn2;
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                         
                 case FACTORIAL: 
@@ -438,18 +421,15 @@ solution solve(string &c, bigNumber previous, settings &user)
                     
                     temp = bigNumber::factorial(bn1);
 					cout << "!";
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);    
                    
                 case EXPONENT: cout << "^"; bn2.printNumber();
 					temp = bigNumber::exponent(bn1, bn2);
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                     //return solution(temp, 0);
                 
                 case ITERATION: cout << "c"; bn2.printNumber();
 					temp = bigNumber::iterations(bn1, bn2);
-					SHOWNUMBER(temp);
 					RETURN_OK(temp);
                     //return solution(temp, 0);
                 
