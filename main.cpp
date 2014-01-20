@@ -442,6 +442,22 @@ solution solve(string &c, bigNumber previous, settings &user)
     }
 }
 
+void printHelp()
+{
+	cout << "This calculator accepts problems in the following formats:\n\n";
+	cout << "\tAddition\n\t	12345.6789 + 98765.4321\n\n";
+	cout << "\tSubtraction\n\t	12345.6789 - 98765.4321\n\n";
+	cout << "\tMultiplication\n\t	12345.6789 * 98765.4321\n\n";
+	cout << "\tDivision\n\t	12345.6789 / 98765.4321\n\n";
+	cout << "\tExponent\n\t	12345.6789 ^ 98765.4321\n\n";
+	cout << "\tFactorial\n\t	12345!\n\n";
+	cout << "To use the previous value, enter the rest of the calculation: \"+ 12345\"\n\n";
+	cout << "To adjust user preferences, you may enter \"options\" or \"settings\".\n";
+	cout << "To change bases, you may enter \"base <desired base>\" or \"binary\", \"decimal\", etc.\n";
+	cout << "Problems can also be entered through the command line.\n";
+	cout << "To end your session, type \"exit\".\n";
+}
+
 bool changeBase(string &c, settings &user)
 {
 	if (c == "base 2" || c == "base2" || c == "binary")
@@ -851,6 +867,8 @@ void modifySettings(settings &user)
 
 int main(int argc, char** argv)
 {
+	cout << endl << "Welcome to BigNum! Enter \"help\" for assistance." << endl << endl;
+
     settings user(10, false, false);
 	bool commline=false;
 
@@ -894,6 +912,12 @@ int main(int argc, char** argv)
 			if (entered == "STATS" || entered == "stats" || entered == "Stats")
 			{
 				displayNumber(previous, user, false, true);
+				continue;
+			}
+
+			if (entered == "help")
+			{
+				printHelp();
 				continue;
 			}
 		}
