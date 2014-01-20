@@ -13,30 +13,51 @@ using std::endl;
 using std::vector;
 using std::string;
 
-#ifndef MAXDIGITS //2
+#ifndef MAXDIGITS
 #define MAXDIGITS 3000
-#endif //2
+#endif
 
-#ifndef PRECISION //3
-#define PRECISION 100
-#endif //3
 
-#ifdef NOCOMMAS //4
+#ifdef P20
+	#define PRECISION 20
+
+#else
+	#ifdef P30
+		#define PRECISION 30
+
+	#else
+		#ifdef P40
+			#define PRECISION 40
+
+		#else
+			#ifdef P50
+				#define PRECISION 50
+
+			#else 
+			#define PRECISION 100
+			#endif
+		#endif
+	#endif
+#endif
+
+#ifdef NOCOMMAS
 #define COMMA 
 #else 
 #define COMMA cout << ","
-#endif //4
+#endif
 
-#ifdef DEBUG //5
+#ifdef DEBUG
 #define SHOWNUMBER(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" << #x << "= " ; x.printNumber(); cout << endl
+#define QUERYNUMBER(x) cout << endl << __FILE__ << " (line " << __LINE__ << "), " << #x << ":\n" ; x.query(); cout << endl
 #define DECLARE(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" << #x << "= " << x
-#define SHOW(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" ; x
+#define SHOW(x) cout << endl << __FILE__ << " (line " << __LINE__ << ") :\t" << #x << "= " << x
 #define SHOWLINE cout << endl << endl << __FILE__ << ": " << __LINE__ << endl
 #else
 #define SHOWNUMBER(x)
+#define QUERYNUMBER(x)
 #define DECLARE(x)
 #define SHOW(x)
 #define SHOWLINE
-#endif //5
+#endif
 
-#endif //1
+#endif

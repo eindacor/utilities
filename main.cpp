@@ -380,6 +380,9 @@ solution solve(string &c, bigNumber previous, settings &user)
 			cout << "Entered: ";
 			displayNumber(bn1, user, printExact, printStats);
 
+			QUERYNUMBER(bn1);
+			QUERYNUMBER(bn2);
+
             //use problem type to calculate solution, return with no errors if valid
             switch(pType)
             {
@@ -437,6 +440,221 @@ solution solve(string &c, bigNumber previous, settings &user)
             }
         }
     }
+}
+
+bool changeBase(string &c, settings &user)
+{
+	if (c == "base 2" || c == "base2" || c == "binary")
+	{
+		user.setBase(2);
+		return true;
+	}
+	
+	if (c == "base 3" || c == "base3" || c == "ternary")
+	{
+		user.setBase(3);
+		return true;
+	}
+
+	if (c == "base 4" || c == "base4" || c == "quaternary")
+	{
+		user.setBase(4);
+		return true;
+	}
+
+	if (c == "base 5" || c == "base5" || c == "quinary")
+	{
+		user.setBase(5);
+		return true;
+	}
+
+	if (c == "base 6" || c == "base6" || c == "senary")
+	{
+		user.setBase(6);
+		return true;
+	}
+
+	if (c == "base 7" || c == "base7" || c == "septenary")
+	{
+		user.setBase(7);
+		return true;
+	}
+
+	if (c == "base 8" || c == "base8" || c == "octonary")
+	{
+		user.setBase(8);
+		return true;
+	}
+
+	if (c == "base 9" || c == "base9" || c == "nonary")
+	{
+		user.setBase(9);
+		return true;
+	}
+
+	if (c == "base 10" || c == "base10" || c == "decimal")
+	{
+		user.setBase(10);
+		return true;
+	}
+
+	if (c == "base 11" || c == "base11" || c == "undenary")
+	{
+		user.setBase(11);
+		return true;
+	}
+
+	if (c == "base 12" || c == "base12" || c == "dozenal" || c == "duodecimal")
+	{
+		user.setBase(12);
+		return true;
+	}
+
+	if (c == "base 13" || c == "base13" || c == "tridecimal")
+	{
+		user.setBase(13);
+		return true;
+	}
+
+	if (c == "base 14" || c == "base14" || c == "quattuordecimal")
+	{
+		user.setBase(14);
+		return true;
+	}
+
+	if (c == "base 15" || c == "base15" || c == "quindecimal")
+	{
+		user.setBase(15);
+		return true;
+	}
+
+	if (c == "base 16" || c == "base16" || c == "sexadecimal" || c == "hexadecimal")
+	{
+		user.setBase(16);
+		return true;
+	}
+
+	if (c == "base 17" || c == "base17" || c == "septendecimal")
+	{
+		user.setBase(17);
+		return true;
+	}
+
+	if (c == "base 18" || c == "base18" || c == "octodecimal")
+	{
+		user.setBase(18);
+		return true;
+	}
+
+	if (c == "base 19" || c == "base19" || c == "nonadecimal")
+	{
+		user.setBase(19);
+		return true;
+	}
+
+	if (c == "base 20" || c == "base20" || c == "vigesimal")
+	{
+		user.setBase(20);
+		return true;
+	}
+
+	if (c == "base 21" || c == "base21")
+	{
+		user.setBase(21);
+		return true;
+	}
+
+	if (c == "base 22" || c == "base22")
+	{
+		user.setBase(22);
+		return true;
+	}
+
+	if (c == "base 23" || c == "base23")
+	{
+		user.setBase(23);
+		return true;
+	}
+
+	if (c == "base 24" || c == "base24")
+	{
+		user.setBase(24);
+		return true;
+	}
+
+	if (c == "base 25" || c == "base25")
+	{
+		user.setBase(25);
+		return true;
+	}
+
+	if (c == "base 26" || c == "base26")
+	{
+		user.setBase(26);
+		return true;
+	}
+
+	if (c == "base 27" || c == "base27")
+	{
+		user.setBase(27);
+		return true;
+	}
+
+	if (c == "base 28" || c == "base28")
+	{
+		user.setBase(28);
+		return true;
+	}
+
+	if (c == "base 29" || c == "base29")
+	{
+		user.setBase(29);
+		return true;
+	}
+
+	if (c == "base 30" || c == "base30")
+	{
+		user.setBase(30);
+		return true;
+	}
+
+	if (c == "base 31" || c == "base31")
+	{
+		user.setBase(31);
+		return true;
+	}
+
+	if (c == "base 32" || c == "base32")
+	{
+		user.setBase(32);
+		return true;
+	}
+
+	if (c == "base 33" || c == "base33")
+	{
+		user.setBase(33);
+		return true;
+	}
+
+	if (c == "base 34" || c == "base34")
+	{
+		user.setBase(34);
+		return true;
+	}
+
+	if (c == "base 35" || c == "base35")
+	{
+		user.setBase(35);
+		return true;
+	}
+
+	if (c == "base 36" || c == "base36")
+	{
+		user.setBase(36);
+		return true;
+	}
+
+	return false;
 }
 
 void modifySettings(settings &user)
@@ -661,6 +879,11 @@ int main(int argc, char** argv)
 			std::getline(cin, entered);
             
 			cout << "-----------------------" << endl;
+
+			if (changeBase(entered, user))
+			{
+				continue;
+			}
 
 			if (entered == "settings" || entered == "options" || entered == "preferences")
             {

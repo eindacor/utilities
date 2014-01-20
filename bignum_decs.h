@@ -26,7 +26,7 @@ class bigNumber
 		bool getNegative() {return negative;}
 		void updateDigits();
 		void adjustPrecision(int n);
-		void query (int n);
+		void query();
 		void printBase(int n);
 		void convertBase(int n);
 		void convertBaseSimple(int n);
@@ -76,7 +76,7 @@ class bigNumber
         static bigNumber subtractNumbers(bigNumber bn1, bigNumber bn2);
         static bigNumber multiplyNumbersSimple(bigNumber bn1, int n);
         static bigNumber multiplyNumbers(bigNumber &bn1, bigNumber &bn2);
-        static int divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r);
+        static bigNumber divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r);
         static bigNumber divideNumbers(bigNumber bn1, bigNumber bn2);
         static bigNumber factorial(bigNumber bn);
         static bigNumber iterations(bigNumber bn1, bigNumber bn2);

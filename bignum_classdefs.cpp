@@ -298,11 +298,12 @@ bigNumber bigNumber::multiplyNumbers(bigNumber &bn1, bigNumber &bn2)
 	return temp;   
 }
 
-int bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
+bigNumber bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
 {
     SHOWNUMBER(bn1);
     SHOWNUMBER(bn2);
-	int temp=0;
+	bigNumber temp;
+	temp.setBase(bn1.getBase());
 	
 	while (bn1 >= bn2)
 	{
@@ -310,19 +311,21 @@ int bigNumber::divideNumbersSimple (bigNumber bn1, bigNumber bn2, bool &r)
 		temp++;
 	}
 
-	if (bn1 > 0)
+	if (temp * bn2 == bn1)
 	{
-		r = true;
+		r = false;
 	}
 
-    SHOW(temp);
+	else r = true;
+
+    SHOWNUMBER(temp);
 	return temp;
 }
 
 bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 {
-    SHOWNUMBER(bn1);
-    SHOWNUMBER(bn2);
+	QUERYNUMBER(bn1);
+	QUERYNUMBER(bn2);
     
     int baseSet=bn1.getBase();
 	bigNumber temp;
@@ -338,22 +341,25 @@ bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 
 	bool remainder=false;
 	bool end=false;
-	int counter=bn1.getDigitCount()-1;
-	bigNumber numberToCompare(bn1.getDigit(counter));
+	int marker=bn1.getDigitCount()-1;
+	bigNumber numberToCompare(bn1.getDigit(marker));
 	numberToCompare.setBase(baseSet);
-	int nextNumber = divideNumbersSimple(numberToCompare, bn2.noDecimal(), remainder);
+	bigNumber nextNumber = divideNumbersSimple(numberToCompare, bn2.noDecimal(), remainder);
 	bigNumber numberToSubtract;
 	numberToSubtract.setBase(baseSet);
 
 	while (end != true)
-	{
-		if (remainder==false && counter < bn1.getDigitCount() - (PRECISION-bn1.getDecimalCount()) )
+	{	
+		SHOW(remainder);
+		SHOW(marker);
+
+		if (remainder==false && marker < PRECISION-bn1.getDecimalCount() )
 		{
 			end = true;
 		}
 
-		temp.setDigit(counter, nextNumber);
-		counter--;
+		temp.setDigit(marker, nextNumber.getDigit(PRECISION));
+		marker--;
 	
 		numberToSubtract = bn2.noDecimal() * nextNumber;
 		numberToSubtract.updateDigits();
@@ -362,14 +368,14 @@ bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 
 		numberToCompare.timesTen(1);
 
-		if (counter>=0)
+		if (marker>=0)
 		{
-			numberToCompare += bn1.getDigit(counter);
+			numberToCompare += bn1.getDigit(marker);
 		}
 
 		nextNumber = divideNumbersSimple(numberToCompare, bn2.noDecimal(), remainder);
 
-		if (counter<0)
+		if (marker<0)
 		{
 			end = true;
 		}
@@ -377,7 +383,7 @@ bigNumber bigNumber::divideNumbers(bigNumber bn1, bigNumber bn2)
 	}
 
 	temp.timesTen(bn2.getDecimalCount());
-	SHOWNUMBER(temp);
+	QUERYNUMBER(temp);
 	return temp;
 }
 
@@ -1242,14 +1248,31 @@ bigNumber bigNumber::noDecimal()
 	return temp;
 }
 
-void bigNumber::query (int n)
+void bigNumber::query()
 {
-	for (int i=0; i<n; i++)
-	{
-		if ((n-i-1)==(PRECISION-1))
-			cout << ".";
+	int count = digitCount - (PRECISION - decimalCount);
 
-		cout << digits[n-i-1];
+/*
+	cout << "|";
+	for (int i=0; i<count; i++)
+	{
+		int marker = (digitCount - i) - 1;
+		if (marker == PRECISION-1)
+			cout << " |";
+
+		cout << marker << "|";
+	}
+
+	count = digitCount - (PRECISION - decimalCount);
+*/
+	cout << "|";
+	for (int i=0; i<count; i++)
+	{
+		int marker = (digitCount - i) - 1;
+		if (marker == PRECISION-1)
+			cout << ".|";
+
+		cout << digits[marker] << "|";
 	}
 	
 	cout << endl;
