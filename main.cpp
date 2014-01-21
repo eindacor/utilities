@@ -450,12 +450,12 @@ void printHelp()
 	cout << "\tMultiplication\n\t	12345.6789 * 98765.4321\n\n";
 	cout << "\tDivision\n\t	12345.6789 / 98765.4321\n\n";
 	cout << "\tExponent\n\t	12345.6789 ^ 98765.4321\n\n";
-	cout << "\tFactorial\n\t	12345!\n\n";
-	cout << "To use the previous value, enter the rest of the calculation: \"+ 12345\"\n\n";
-	cout << "To adjust user preferences, you may enter \"options\" or \"settings\".\n";
-	cout << "To change bases, you may enter \"base <desired base>\" or \"binary\", \"decimal\", etc.\n";
-	cout << "Problems can also be entered through the command line.\n";
-	cout << "To end your session, type \"exit\".\n";
+	cout << "\tFactorial\n\t	123!\n\n";
+	cout << "- To use the previous value, enter the rest of the calculation like so: \"+ 12345\"\n\n";
+	cout << "- To change bases, enter \"base <desired base>\" or \"binary\", \"decimal\", etc.\n\n";
+	cout << "- To show/hide statistics, enter \"show stats\" or \"hide stats\".\n\n";
+	cout << "- Problems can also be entered through the command line.\n\n";
+	cout << "- To end your session, type \"exit\".\n\n";
 }
 
 bool changeBase(string &c, settings &user)
@@ -908,10 +908,18 @@ int main(int argc, char** argv)
                 modifySettings(user);
                 continue;
             }
-
-			if (entered == "STATS" || entered == "stats" || entered == "Stats")
+			
+			if (entered == "show stats")
 			{
-				displayNumber(previous, user, false, true);
+			    cout << "\nNumber stats are visible\n\n";
+			    user.showDigitsOn();
+				continue;
+			}
+			
+			if (entered == "hide stats")
+			{
+			    cout << "\nNumber stats are hidden\n\n";
+			    user.showDigitsOff();
 				continue;
 			}
 

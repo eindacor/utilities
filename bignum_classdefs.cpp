@@ -514,6 +514,10 @@ void bigNumber::convertBase(int n)
 				bigNumber numberToAdd = digitValue * exp;
 				temp += numberToAdd;
 			}			
+			
+			if (getNegative())
+			    temp.setNegative();
+			    
 			*this = temp;
 		}
 	}
