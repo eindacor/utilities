@@ -161,8 +161,10 @@ solution solve(string &c, bigNumber previous, settings &user)
     int decimalCount1=0;
     int decimalCount2=0;
     int numbers=0;
+	int commaNumbers=0;
 
     bool decimal=false;
+	bool comma=false;
 	bool negative1=false;
 	bool negative2=false;
     bool done=false;
@@ -177,8 +179,27 @@ solution solve(string &c, bigNumber previous, settings &user)
     for (int i=0; i<c.size(); i++)
     {
 		//if it isn't a space, number, symbol, end marker, or decimal point, return error
-		if (checkSpace(c[i])==false && isNumber(c[i], user)==false && isSymbol(c[i])==false && c[i] != '$' && c[i] != '.')
+		if (checkSpace(c[i])==false && 
+			isNumber(c[i], user)==false && 
+			isSymbol(c[i])==false && 
+			c[i] != '$' && 
+			c[i] != '.')
 		{
+			RETURN_ERROR;
+		}
+
+		if (c[i]==',')
+		{
+			if (comma==false)
+			{
+				if (decimal==true || numbers==0 || numbers > 3)
+					RETURN_ERROR;
+
+				else comma = true;
+			}
+
+			else if (commaNumbers != 3)
+			
 			RETURN_ERROR;
 		}
 			
@@ -241,6 +262,7 @@ solution solve(string &c, bigNumber previous, settings &user)
                     pType = SUBTRACT;
                     targetBN = &bn2;
                     numbers=0;
+					commaNumbers=0;
                     bn2.setNegative(); //sets 2nd number to negative
 					negative2=true; //sets 2nd number to negative
                     targetNegative= &negative2;
@@ -261,6 +283,7 @@ solution solve(string &c, bigNumber previous, settings &user)
             {
                 pType = SUBTRACT;
                 numbers=0;
+				commaNumbers=0;
                 done=false;
                 targetBN = &bn2;
 				targetNegative= &negative2;
@@ -291,6 +314,7 @@ solution solve(string &c, bigNumber previous, settings &user)
                 pType = checkSymbol(c[i]);
                 targetBN = &bn2;
                 numbers=0;
+				commaNumbers=0;
                 done=false;
 				targetNegative = &negative2;
                 targetDec = &decimalCount2;
