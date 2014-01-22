@@ -143,6 +143,17 @@ bigNumber numberFromVector(vector<int> &vec, bool neg, int dec, settings &user)
 	return temp;
 }
 
+bool checkWord(string &c, int start, string compare)
+{
+    for (int i=0; i<compare.size(); i++)
+    {
+        if (c[start+i] != compare[i])
+            return false;
+    }
+    
+    return true;
+}
+
 solution solve(string &c, bigNumber previous, settings &user)
 {
     c += '$';
@@ -160,8 +171,8 @@ solution solve(string &c, bigNumber previous, settings &user)
 
     int decimalCount1=0;
     int decimalCount2=0;
+    int commaNumbers=0;
     int numbers=0;
-	int commaNumbers=0;
 
     bool decimal=false;
 	bool comma=false;
@@ -176,13 +187,49 @@ solution solve(string &c, bigNumber previous, settings &user)
     int* targetDec = &decimalCount1;
 	bool* targetNegative = &negative1;
     
-    for (int i=0; i<c.size(); i++)
+    int counter = c.size();
+    
+    for (int i=0; i<counter; i++)
     {
+        if (checkWord(c, i, "pi"))
+        {
+            if (numbers>0 || comma==true || decimal==true)
+            {
+                RETURN_ERROR;
+            }
+            
+            else
+            {
+                bigNumber piNumber = bigNumber::pi();
+                piNumber.convertBase(user.getBase());
+                if (*targetNegative==true)
+                    piNumber.setNegative();
+                    
+                *targetBN = piNumber;
+                
+                done=true;
+                first.push_back(0);
+                
+                numbers += (PRECISION+1);
+                counter += 2;
+                i += 2;
+                
+                SHOWNUMBER(piNumber);
+                QUERYNUMBER(piNumber);
+            }
+        }
+        
+        if (checkWord(c, i, "theta"))
+        {
+            
+        }
+        
 		//if it isn't a space, number, symbol, end marker, or decimal point, return error
 		if (checkSpace(c[i])==false && 
 			isNumber(c[i], user)==false && 
 			isSymbol(c[i])==false && 
 			c[i] != '$' && 
+			c[i] != ',' && 
 			c[i] != '.')
 		{
 			RETURN_ERROR;
@@ -192,15 +239,16 @@ solution solve(string &c, bigNumber previous, settings &user)
 		{
 			if (comma==false)
 			{
-				if (decimal==true || numbers==0 || numbers > 3)
+				if (decimal==true || numbers==0 || numbers > 3 || done==true)
 					RETURN_ERROR;
 
 				else comma = true;
 			}
 
 			else if (commaNumbers != 3)
-			
-			RETURN_ERROR;
+			    RETURN_ERROR;
+			    
+			commaNumbers=0;    
 		}
 			
 		//if it's a space
@@ -227,18 +275,18 @@ solution solve(string &c, bigNumber previous, settings &user)
 			{
                 RETURN_ERROR;
 			}
+			
+		    if (comma==true)
+		        commaNumbers++;
                 
             //otherwise add number to target vector, add decimal count if needed
-            else 
-            {
-                (*targetVec).push_back(checkNumber(c[i]));
+            (*targetVec).push_back(checkNumber(c[i]));
                 numbers++;
                 
-                if (decimal==true)
-				{
-                    (*targetDec)++;
-				}
-            }
+            if (decimal==true)
+			{
+                (*targetDec)++;
+			}
         }
         
         //if it's a minus symbol
@@ -263,6 +311,7 @@ solution solve(string &c, bigNumber previous, settings &user)
                     targetBN = &bn2;
                     numbers=0;
 					commaNumbers=0;
+					comma=false;
                     bn2.setNegative(); //sets 2nd number to negative
 					negative2=true; //sets 2nd number to negative
                     targetNegative= &negative2;
@@ -281,9 +330,13 @@ solution solve(string &c, bigNumber previous, settings &user)
             //if numbers have been added, and the target is the first number, the problem type is subtraction
             else if (targetBN == &bn1)
             {
+                if (comma==true && decimal==false && commaNumbers != 3)
+                    RETURN_ERROR;
+                
                 pType = SUBTRACT;
                 numbers=0;
 				commaNumbers=0;
+				comma=false;
                 done=false;
                 targetBN = &bn2;
 				targetNegative= &negative2;
@@ -311,10 +364,14 @@ solution solve(string &c, bigNumber previous, settings &user)
             //otherwise, set problem type based on symbol and reset figures
             else 
             {
+                if (comma==true && decimal==false && commaNumbers != 3)
+                    RETURN_ERROR;
+                
                 pType = checkSymbol(c[i]);
                 targetBN = &bn2;
                 numbers=0;
 				commaNumbers=0;
+				comma=false;
                 done=false;
 				targetNegative = &negative2;
                 targetDec = &decimalCount2;
@@ -333,11 +390,17 @@ solution solve(string &c, bigNumber previous, settings &user)
 			}
                 
             else decimal = true;
+            
+            if (comma==true && commaNumbers != 3)
+                RETURN_ERROR;
         }
         
         //if it's an endline character
         else if (c[i] == '$')
         {
+            if (comma==true && decimal==false && commaNumbers != 3)
+                    RETURN_ERROR;
+                    
 			//if both numbers are empty
 			if (first.size()==0 && second.size()==0)
 			{
@@ -403,67 +466,65 @@ solution solve(string &c, bigNumber previous, settings &user)
 
 			cout << "Entered: ";
 			displayNumber(bn1, user, printExact, printStats);
-
-			QUERYNUMBER(bn1);
-			QUERYNUMBER(bn2);
-
-            //use problem type to calculate solution, return with no errors if valid
-            switch(pType)
-            {
-                case ERROR: RETURN_ERROR;
-                
-                case ADD: cout << " + "; bn2.printNumber();
-                    temp = bn1 + bn2;
-					RETURN_OK(temp);
-                
-                case SUBTRACT: cout << " - "; bn2.printNumber();
-					temp = bn1 - bn2;
-					RETURN_OK(temp);
-                        
-                case MULTIPLY: cout << " * "; bn2.printNumber();
-					temp = bn1 * bn2;
-					RETURN_OK(temp);
-                        
-                case DIVIDE: cout << " / "; bn2.printNumber();
-                    if (bn2==0)
-                    {
-                        RETURN_ERROR;
-                    }
-                    temp = bn1 / bn2;
-					RETURN_OK(temp);
-                        
-                case FACTORIAL: 
-					if (bn1<0 || bn1.getDecimalCount() > 0)
-                    {
-						RETURN_ERROR;
-                    }
-                    
-                    else if (bn1==0)
-                    {
-						cout << "!";
-						bigNumber fact(1);
-						fact.setBase(user.getBase());
-						RETURN_OK(fact);
-                    }
-                    
-                    temp = bigNumber::factorial(bn1);
-					cout << "!";
-					RETURN_OK(temp);    
-                   
-                case EXPONENT: cout << "^"; bn2.printNumber();
-					temp = bigNumber::exponent(bn1, bn2);
-					RETURN_OK(temp);
-                    //return solution(temp, 0);
-                
-                case ITERATION: cout << "c"; bn2.printNumber();
-					temp = bigNumber::iterations(bn1, bn2);
-					RETURN_OK(temp);
-                    //return solution(temp, 0);
-                
-                default: RETURN_ERROR;
-            }
+			
+			break;
         }
     }
+    
+    //use problem type to calculate solution, return with no errors if valid
+    switch(pType)
+    {
+        case ERROR: RETURN_ERROR;
+        
+        case ADD: cout << " + "; bn2.printNumber();
+            temp = bn1 + bn2;
+			RETURN_OK(temp);
+        
+        case SUBTRACT: cout << " - "; bn2.printNumber();
+			temp = bn1 - bn2;
+			RETURN_OK(temp);
+                
+        case MULTIPLY: cout << " * "; bn2.printNumber();
+			temp = bn1 * bn2;
+			RETURN_OK(temp);
+                
+        case DIVIDE: cout << " / "; bn2.printNumber();
+            if (bn2==0)
+            {
+                RETURN_ERROR;
+            }
+            temp = bn1 / bn2;
+			RETURN_OK(temp);
+                
+        case FACTORIAL: 
+			if (bn1<0 || bn1.getDecimalCount() > 0)
+            {
+				RETURN_ERROR;
+            }
+            
+            else if (bn1==0)
+            {
+				cout << "!";
+				bigNumber fact(1);
+				fact.setBase(user.getBase());
+				RETURN_OK(fact);
+            }
+            
+            temp = bigNumber::factorial(bn1);
+			cout << "!";
+			RETURN_OK(temp);    
+           
+        case EXPONENT: cout << "^"; bn2.printNumber();
+			temp = bigNumber::exponent(bn1, bn2);
+			RETURN_OK(temp);
+        
+        case ITERATION: cout << "c"; bn2.printNumber();
+			temp = bigNumber::iterations(bn1, bn2);
+			RETURN_OK(temp);
+        
+        default: RETURN_ERROR;
+    }
+
 }
 
 void printHelp()
@@ -476,10 +537,15 @@ void printHelp()
 	cout << "\tExponent\n\t	12345.6789 ^ 98765.4321\n\n";
 	cout << "\tFactorial\n\t	123!\n\n";
 	cout << "- To use the previous value, enter the rest of the calculation like so: \"+ 12345\"\n\n";
-	cout << "- To change bases, enter \"base <desired base>\" or \"binary\", \"decimal\", etc.\n\n";
+	cout << "- To change bases, enter \"base 12\" or \"binary\", \"decimal\", etc.\n\n";
 	cout << "- To show/hide statistics, enter \"show stats\" or \"hide stats\".\n\n";
-	cout << "- Problems can also be entered through the command line.\n\n";
+	cout << "- To reset the calculator, enter \"clear\" or \"reset\".\n\n";
+	cout << "- Problems can also be entered in the command line without spaces.\n\n";
 	cout << "- To end your session, type \"exit\".\n\n";
+	cout << "NOTE: Factorials and base conversions of large decimals can be very time\n";
+	cout << "consuming. To exit out of the program mid-calculation, press ctrl+C.\n\n";
+	
+	//      "01234567890123456789012345678901234567890123456789012345678901234567890123456789"
 }
 
 bool changeBase(string &c, settings &user)
@@ -924,6 +990,14 @@ int main(int argc, char** argv)
 
 			if (changeBase(entered, user))
 			{
+				continue;
+			}
+			
+			if (entered == "clear" || entered == "reset")
+			{
+			    bigNumber reset(0);
+			    reset.setBase(user.getBase());
+			    previous = reset;
 				continue;
 			}
 

@@ -572,6 +572,38 @@ void bigNumber::operator ++ (int)
 	*this += temp;
 }
 
+bigNumber bigNumber::pi()
+{
+    string piString(PI);
+    bigNumber piNumber(0);
+    
+    for (int i=PRECISION; i>=0; i--)
+    {
+        char c = '0';
+        int n = piString[PRECISION-i] + c;
+        
+        piNumber.setDigit(i, n);
+    }
+    
+    return piNumber;
+}
+
+bigNumber bigNumber::theta()
+{
+    string thetaString(THETA);
+    bigNumber thetaNumber(0);
+    
+    for (int i=PRECISION; i>=0; i--)
+    {
+        char c = '0';
+        int n = thetaString[PRECISION-i] + c;
+        
+        thetaNumber.setDigit(i, n);
+    }
+    
+    return thetaNumber;
+}
+
 bigNumber::bigNumber(int n)
 {
 	negative = (n<0);
@@ -1018,7 +1050,6 @@ int bigNumber::printNumber()
 		}
 
         printDigit(digits[target]);
-		//cout << digits[target];
 
 		comma--;
 	}
@@ -1079,13 +1110,11 @@ int bigNumber::printNumber(int n)
         if (i == toPrint-1 && target > 0 && digits[target-1] > 4)
         {
             printDigit(digits[target]+1);
-            //cout << (digits[target]+1);
         }
             
         else
         {
             printDigit(digits[target]);
-		    //cout << digits[target];
         }
 
 		comma--;
@@ -1215,6 +1244,20 @@ void bigNumber::operator /= (bigNumber b)
 	*this = *this / b;
 }
 
+bigNumber bigNumber::golden(bigNumber b)
+{
+    bigNumber temp1 = bigNumber(fibonacci(b));
+    bigNumber temp2 = bigNumber(fibonacci(b-1));
+    
+    return temp1/temp2;
+}
+
+bigNumber bigNumber::golden(int n)
+{
+    bigNumber temp(n);
+    return golden(temp);   
+}
+
 bigNumber bigNumber::fibonacci(bigNumber b)
 {
     bigNumber counter;
@@ -1256,19 +1299,6 @@ void bigNumber::query()
 {
 	int count = digitCount - (PRECISION - decimalCount);
 
-/*
-	cout << "|";
-	for (int i=0; i<count; i++)
-	{
-		int marker = (digitCount - i) - 1;
-		if (marker == PRECISION-1)
-			cout << " |";
-
-		cout << marker << "|";
-	}
-
-	count = digitCount - (PRECISION - decimalCount);
-*/
 	cout << "|";
 	for (int i=0; i<count; i++)
 	{

@@ -1,7 +1,8 @@
 #ifndef BIGNUM_DECS_H
 #define BIGNUM_DECS_H
 
-enum PTYPE {ERROR, ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, LESSTHAN, LESSTHANEQUALS, GREATERTHAN, GREATERTHANEQUALS, EQUALS, FACTORIAL, ITERATION};
+//enum PTYPE {ERROR, ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, LESSTHAN, LESSTHANEQUALS, GREATERTHAN, GREATERTHANEQUALS, EQUALS, FACTORIAL, ITERATION};
+enum PTYPE {ERROR, ADD, SUBTRACT, MULTIPLY, DIVIDE, EXPONENT, FIBONACCI, GOLDEN, FACTORIAL, ITERATION};
 
 class bigNumber
 {
@@ -83,6 +84,10 @@ class bigNumber
         static bigNumber exponent(bigNumber bn1, bigNumber bn2);
         static bigNumber fibonacci(bigNumber bn1);
         static bigNumber fibonacci(int n);
+        static bigNumber golden(bigNumber bn1);
+        static bigNumber golden(int n);
+        static bigNumber pi();
+        static bigNumber theta();
 
 		void decrement();
 
