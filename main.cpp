@@ -200,28 +200,51 @@ solution solve(string &c, bigNumber previous, settings &user)
             
             else
             {
-                bigNumber piNumber = bigNumber::pi();
-                piNumber.convertBase(user.getBase());
-                if (*targetNegative==true)
-                    piNumber.setNegative();
-                    
-                *targetBN = piNumber;
+                string piString(PI);
+		
+				for (int piMarker=PRECISION; piMarker>=0; piMarker--)
+				{
+					char piChar = '0';
+					int piNum = piString[PRECISION-piMarker] - piChar;
+				
+					(*targetVec).push_back(piNum);
+				}
                 
                 done=true;
-                first.push_back(0);
+				*targetDec = PRECISION;
                 
                 numbers += (PRECISION+1);
                 counter += 2;
                 i += 2;
-                
-                SHOWNUMBER(piNumber);
-                QUERYNUMBER(piNumber);
             }
         }
         
         if (checkWord(c, i, "theta"))
         {
+            if (numbers>0 || comma==true || decimal==true)
+            {
+                RETURN_ERROR;
+            }
             
+            else
+            {
+                string thetaString(THETA);
+		
+				for (int thetaMarker=PRECISION; thetaMarker>=0; thetaMarker--)
+				{
+					char thetaChar = '0';
+					int thetaNum = thetaString[PRECISION-thetaMarker] - thetaChar;
+				
+					(*targetVec).push_back(thetaNum);
+				}
+                
+                done=true;
+				*targetDec = PRECISION;
+                
+                numbers += (PRECISION+1);
+                counter += 5;
+                i += 5;
+            }
         }
         
 		//if it isn't a space, number, symbol, end marker, or decimal point, return error
@@ -414,9 +437,9 @@ solution solve(string &c, bigNumber previous, settings &user)
 
 			//if first number is empty, set bn1 to previous
 			if (first.size()==0)
-				{
-					bn1 = previous;
-				}
+			{
+				bn1 = previous;
+			}
 
 			//otherwise create bn1 from entered and print it as is
             else

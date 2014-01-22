@@ -580,7 +580,7 @@ bigNumber bigNumber::pi()
     for (int i=PRECISION; i>=0; i--)
     {
         char c = '0';
-        int n = piString[PRECISION-i] + c;
+        int n = piString[PRECISION-i] - c;
         
         piNumber.setDigit(i, n);
     }
